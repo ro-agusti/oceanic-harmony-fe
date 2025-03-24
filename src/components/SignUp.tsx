@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom'
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ function SignUp() {
   });
 
   const [message, setMessage] = useState('');
+  const navigate = useNavigate(); // Para redirigir
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,10 +40,12 @@ function SignUp() {
   return (
     
     <div className="p-10 text-center">
+      <button onClick={() => navigate('/')}>
       <img src={'/logoWave.png'} className= 'h-40 p-4 mx-auto' alt="Oceanic Harmony logo" />
+      </button>
     <div className='p-4'>
-      <h2 className="text-l font-bold font-mono text-gray-700 mb-4">Join the Oceanic Harmony community!</h2>
-      <text className="text-m font-mono text-gray-700 mb-4">Join the Oceanic Harmony community! Create your account and start your journaling journey to connect with yourself and transform your daily life.</text>
+      <h2 className="text-xl font-bold font-mono text-gray-700 mb-4">Join the Oceanic Harmony community!</h2>
+      <text className="text-sm font-mono text-gray-700 mb-4">Join the Oceanic Harmony community! Create your account and start your journaling journey to connect with yourself and transform your daily life.</text>
     </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
@@ -74,17 +78,18 @@ function SignUp() {
         <input
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder="password"
           value={formData.password}
           onChange={handleChange}
           className="border bg-inherit p-2 font-mono border-gray-300"
           required
         />
-        <button type="submit" className="font-mono bg-gray-600 text-white px-6 py-2 rounded hover:bg-blue-600">
+        <button type="submit" className="font-mono bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
           Sign Up
         </button>
+        <button type="submit" className="text-m font-mono text-gray-700 mb-4 hover:underline" onClick={() => navigate('/login')}>Already have an account? Log in here!</button>
       </form>
-      {message && <p className="mt-4 text-red-500">{message}</p>}
+      {message && <p className="mt-4 text-gray-500">{message}</p>}
     </div>
   );
 }
