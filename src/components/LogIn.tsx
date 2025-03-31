@@ -26,8 +26,16 @@ function LogIn() {
 
       const data = await response.json();
       if (response.ok) {
-        setMessage('User registered successfully! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000); // Redirige al login después de 2 segundos
+        // setMessage('User registered successfully! Redirecting to login...');
+        // setTimeout(() => navigate('/login'), 2000); // Redirige al login después de 2 segundos
+        localStorage.setItem("token", data.token); // Guarda el token
+        const user = JSON.parse(atob(data.token.split(".")[1])); // Decodifica el token
+  
+        if (user.role === "admin") {
+          navigate("/admin"); // Si es admin, va a HomeAdmin
+        } else {
+          navigate("/"); // Si no es admin, va al Home normal
+        }
       } else {
         setMessage(`Error: ${data.message}`);
       }

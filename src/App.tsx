@@ -4,42 +4,10 @@ import './App.css'
 import Home from './components/Home'
 import SignUp from './components/SignUp'
 import LogIn from './components/LogIn'
-
-// function Home() {
-//   // const [count, setCount] = useState(0)
-//   const navigate = useNavigate() // Hook para redirigir a otra página
-
-//   return (
-//     <>
-//     <nav className="fixed top-0 w-full flex justify-between  p-4 border-b border-gray-300">
-//   <h1 className="text-2xl font-bold text-gray-700 font-mono">
-//     Oceanic Harmony
-//   </h1>
-//   <div className="flex gap-4">
-//     <button className=" text-gray-500 hover:underline " onClick={() => navigate('/login')}>
-//       Log In
-//     </button>
-//     <button className=" text-gray-500 hover:underline" onClick={() => navigate('/signup')}>
-//       Sign Up
-//     </button>
-//   </div>
-// </nav>
-//       <div className="card">
-//       <img src={'/logoWave.png'} className= 'h-40 p-4 mx-auto' alt="Oceanic Harmony logo" />
-
-//         <p className=' p-5 font-mono'>
-//         Oceanic Harmony is a space for self-discovery and growth. It helps you tap into your strengths, organize your thoughts, and level up in life. Think of it as a mix of introspective challenges and guidance to bring out your best self and turn your dreams into action.
-//         </p>
-//         <section className="text-center mt-8">
-//   <button className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-//     See Challenges
-//   </button>
-// </section>
-//       </div>
-      
-//     </>
-//   )
-// }
+import HomeAdmin from './components/admin/HomeAdmin'
+import Challenges from './components/admin/Challenges'
+//import Journals from './components/admin/Journals'
+//import Questions from './components/admin/Questions'
 
 function App() {
   return (
@@ -47,6 +15,10 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<LogIn />} />
+      <Route path="/admin" element={<HomeAdmin />} />
+      <Route path="/admin/challenges" element={<Challenges />} />
+      {/* <Route path="/admin" element={<Journals />} />
+      <Route path="/admin" element={<Questions />} /> */}
     </Routes>
   )
 }
