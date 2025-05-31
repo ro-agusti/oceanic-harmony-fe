@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function AdminNav() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-screen-lg bg-transparent z-50 border-b border-gray-300 p-4 bg-[#f8f1e8]">
@@ -16,16 +16,16 @@ function AdminNav() {
         </button>
 
         {/* Botón menú hamburguesa (Tablet & Mobile) */}
-        <div className="md:hidden">
-          <button onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
+        
+        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+        
 
         {/* Menú de navegación */}
         <div
           className={`${
-            isOpen ? "flex" : "hidden"
+            menuOpen ? "flex" : "hidden"
           } md:flex flex-col md:flex-row gap-4 md:static bg-transparent shadow-md md:shadow-none p-4 md:p-0`}
         >
           <button
@@ -50,7 +50,7 @@ function AdminNav() {
             className="flex items-center gap-2 text-red-500 hover:underline"
             onClick={() => {
               localStorage.removeItem("token");
-              navigate("/login");
+              navigate("/");
             }}
           >
             <LogOut size={20} /> Logout

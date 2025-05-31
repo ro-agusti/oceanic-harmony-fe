@@ -42,7 +42,10 @@ function HomeAdmin() {
           Questions
         </button>
         <button
-          onClick={() => navigate("/admin/Questions")}
+          onClick={() => {
+            localStorage.removeItem("token");
+            navigate("/");
+          }}
           className="w-full py-4 text-xl font-semibold text-gray-500 bg-gray-300 rounded-lg shadow-lg hover:bg-gray-200 transition"
         >
           Log out

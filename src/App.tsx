@@ -5,7 +5,10 @@ import Home from './components/Home'
 import SignUp from './components/SignUp'
 import LogIn from './components/LogIn'
 import HomeAdmin from './components/admin/HomeAdmin'
-import Challenges from './components/admin/Challenges'
+import Challenges from './components/admin/challenges/Challenges'
+import CreateChallenge from './components/admin/challenges/CreateChallenges'
+import AssignQuestions from './components/admin/challenges/AssignQuestions'
+
 //import Journals from './components/admin/Journals'
 //import Questions from './components/admin/Questions'
 
@@ -17,6 +20,8 @@ function App() {
       <Route path="/login" element={<LogIn />} />
       <Route path="/admin" element={<HomeAdmin />} />
       <Route path="/admin/challenges" element={<Challenges />} />
+      <Route path="/admin/create-challenge" element={<CreateChallenge />} />
+       <Route path="/admin/assign-questions/:challengeId" element={<AssignQuestions />} />
       {/* <Route path="/admin" element={<Journals />} />
       <Route path="/admin" element={<Questions />} /> */}
     </Routes>

@@ -1,7 +1,7 @@
-import AdminNav from "./AdminNav";
+import AdminNav from "../AdminNav";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, PlusCircle } from "lucide-react";
 
 interface Challenge {
   id: string;
@@ -109,6 +109,10 @@ function Challenges() {
     }
   }, [navigate]);
 
+  const handleCreateChallenge = () => {
+    navigate("/admin/create-challenge"); // Ajusta la ruta según tu configuración
+  };
+
   const handleEdit = (id: string) => {
     navigate(`/admin/edit-challenge/${id}`);
   };
@@ -144,9 +148,18 @@ function Challenges() {
     <>
       <AdminNav />
       <div className="p-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between">
+      <div className="flex items-center justify-between mt-20">
+  <h1 className="text-2xl font-bold text-gray-700 font-mono">Challenges</h1>
+  <button
+    onClick={handleCreateChallenge}
+    className="bg-gray-400 text-gray-300 p-2 rounded hover:bg-gray-500 flex items-center justify-center w-10 h-10"
+  >
+    <PlusCircle size={26} />
+  </button>
+</div>
+        {/* <div className="flex flex-col sm:flex-row items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-700 font-mono mt-20">Challenges</h1>
-        </div>
+        </div> */}
 
         {/* Listado de Challenges */}
         <div className="mt-6">
@@ -208,7 +221,7 @@ function Challenges() {
           className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
           onClick={() => {
             localStorage.removeItem("token");
-            navigate("/login");
+            navigate("/");
           }}
         >
           Cerrar sesión
