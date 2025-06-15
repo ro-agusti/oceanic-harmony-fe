@@ -1,7 +1,7 @@
 import AdminNav from "../AdminNav";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Pencil, Trash2, PlusCircle } from "lucide-react";
+import { Pencil, Trash2, PlusCircle, HelpCircle } from "lucide-react";
 
 interface Challenge {
   id: string;
@@ -113,6 +113,10 @@ function Challenges() {
     navigate("/admin/create-challenge"); // Ajusta la ruta según tu configuración
   };
 
+  const handleAssignQuestions = (id: string) => {
+  navigate(`/admin/assign-questions/${id}`);
+};
+
   const handleEdit = (id: string) => {
     navigate(`/admin/edit-challenge/${id}`);
   };
@@ -172,14 +176,26 @@ function Challenges() {
               onClick={() => toggleExpand(challenge.id)}
             >
                <div className="w-full font-mono ">
-                  <h2 className="text-l font-bold  lowercase text-gray-700 text-left">{challenge.title}</h2> 
-                  <p className="p-3 text-sm text-left text-gray-500">{challenge.description}</p>
-                  <div className="flex justify-between items-center w-full font-mono text-sm lowercase text-gray-600 ">
-                  <h4 className=" p-1 text-xs font-bold font-mono lowercase text-gray-600 text-left">days {challenge.days}</h4> 
-                    <p className="text-right font-semibold">${challenge.price}</p>
-                  </div>
-                
-                {/* Sección de preguntas (visible solo si el challenge está expandido) */}
+  <div className="flex items-center justify-between">
+    <h2 className="text-l text-left font-bold lowercase text-gray-700">{challenge.title}</h2>
+    <button
+      className="px-3 py-1 text-right text-gray-600 hover:text-gray-400 flex "
+      onClick={() => handleAssignQuestions(challenge.id)}
+    >
+      <HelpCircle size={16} className="mr-1" /> Modify questions
+      
+    </button>
+  </div>
+
+  <p className="p-3 text-sm text-left text-gray-500">{challenge.description}</p>
+
+  <div className="flex justify-between items-center w-full font-mono text-sm lowercase text-gray-600 ">
+    <h4 className="p-1 text-xs font-bold lowercase text-gray-600 text-left">
+      days {challenge.days}
+    </h4>
+    <p className="text-right font-semibold">${challenge.price}</p>
+  </div>
+
   {expandedChallengeId === challenge.id && (
     challenge.ChallengeQuestions.length > 0 ? (
       <ul className="mt-2 p-2 text-left">
@@ -193,25 +209,23 @@ function Challenges() {
       <p className="text-xs text-gray-500 mt-2">No questions available.</p>
     )
   )}
-               
-                 {/* Botones de edición y eliminación */}
-                <div className="flex justify-end  mt-1 0">
-                  
 
-                  <button
-                    className="px-3 py-1  text-gray-600 mr-2 hover:text-gray-400"
-                    onClick={() => handleEdit(challenge.id)}
-                  >
-                    <Pencil size={16} className="mr-1" />
-                  </button>
-                  <button
-                    className="px-3 py-1 text-gray-600 hover:text-gray-400"
-                    onClick={() => handleDelete(challenge.id)}
-                  >
-                    <Trash2 size={16} className="mr-1" />
-                  </button>
-                  </div>
-                </div>
+  <div className="flex justify-end mt-1">
+    <button
+      className="px-3 py-1 text-gray-600 mr-2 hover:text-gray-400"
+      onClick={() => handleEdit(challenge.id)}
+    >
+      <Pencil size={16} className="mr-1" />
+    </button>
+    <button
+      className="px-3 py-1 text-gray-600 hover:text-gray-400"
+      onClick={() => handleDelete(challenge.id)}
+    >
+      <Trash2 size={16} className="mr-1" />
+    </button>
+  </div>
+</div>
+
               </li>
             ))}
           </ul>
