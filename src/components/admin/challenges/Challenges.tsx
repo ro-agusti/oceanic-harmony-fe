@@ -114,7 +114,7 @@ function Challenges() {
   };
 
   const handleAssignQuestions = (id: string) => {
-  navigate(`/admin/assign-questions/${id}`);
+  navigate(`/admin/challenge-manager/${id}`);
 };
 
   const handleEdit = (id: string) => {
