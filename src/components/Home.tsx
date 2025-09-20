@@ -52,7 +52,10 @@ function Home() {
           Oceanic Harmony is a space for self-discovery and growth. It helps you tap into your strengths, organize your thoughts, and level up in life. Think of it as a mix of introspective challenges and guidance to bring out your best self and turn your dreams into action.
           </p>
           <section className="text-center mt-8">
-    <button className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+    <button
+      onClick={() => navigate("/challenges")}
+      className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+    >
       See Challenges
     </button>
   </section>

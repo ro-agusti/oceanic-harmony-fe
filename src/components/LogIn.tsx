@@ -34,7 +34,7 @@ function LogIn() {
         if (user.role === "admin") {
           navigate("/admin"); // Si es admin, va a HomeAdmin
         } else {
-          navigate("/"); // Si no es admin, va al Home normal
+          navigate("/user"); // Si no es admin, va al Home normal
         }
       } else {
         setMessage(`Error: ${data.message}`);
