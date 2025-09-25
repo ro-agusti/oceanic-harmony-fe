@@ -7,8 +7,8 @@ function AdminNav() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 l w-full max-w-screen-lg bg-transparent z-50 border-b border-gray-300 p-4 bg-[#f8f1e8]">
-      <div className="flex justify-between items-center">
+    <nav className="fixed top-0 left-0 w-full bg-[#f8f1e8] z-50 border-b border-gray-300">
+  <div className="max-w-screen-lg mx-auto flex justify-between items-center p-4">
         {/* Logo */}
         <button onClick={() => navigate('/admin')}>
 

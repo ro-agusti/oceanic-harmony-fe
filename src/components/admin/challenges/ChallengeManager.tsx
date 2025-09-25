@@ -65,23 +65,27 @@ function ChallengeManager() {
         <ChallengeSummary challengeId={challengeId} />
       </section>
 
-      <main className="w-full mt-4 mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[#fbf7f1] p-3 rounded-lg shadow border md:col-span-1 h-[400px]">
-          <h2 className="text-left text-xl font-semibold mb-2 text-gray-800 font-mono">CREATE NEW QUESTION</h2>
-          <CreateQuestionForm
-            challengeId={challengeId}
-            onQuestionCreated={handleQuestionCreated}
-          />
-        </div>
+      <main className="w-full mt-4 mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+  <div className="bg-[#fbf7f1] p-3 rounded-lg shadow border md:col-span-1 ">
+  <h2 className="text-left text-xl font-semibold mb-2 text-gray-800 font-mono">
+    CREATE NEW QUESTION
+  </h2>
+  <CreateQuestionForm
+    challengeId={challengeId}
+    onQuestionCreated={handleQuestionCreated}
+  />
+</div>
 
-        <div className="bg-[#fbf7f1] p-3 rounded-lg shadow border md:col-span-2 ">
-          <h2 className="text-xl text-left font-semibold mb-4">SELECT QUESTION</h2>
-          <AllQuestionsList
-            refreshSignal={refreshKey}
-            onSelectQuestion={handleSelectQuestion}
-          />
-        </div>
-      </main>
+  {/* Columna derecha */}
+  <div className="bg-[#fbf7f1] p-3 rounded-lg shadow border md:col-span-2 flex flex-col">
+    <h2 className="text-xl text-left font-semibold mb-4">SELECT QUESTION</h2>
+    <AllQuestionsList
+      refreshSignal={refreshKey}
+      onSelectQuestion={handleSelectQuestion}
+    />
+  </div>
+</main>
+
 
       <section className="w-full bg-[#fbf7f1] mt-3 border shadow rounded-lg p-3">
         <div className="max-w-7xl mx-auto">

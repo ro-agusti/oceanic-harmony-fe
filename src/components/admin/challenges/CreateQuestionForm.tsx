@@ -2,8 +2,8 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface CreateQuestionFormProps {
-    challengeId?: string;
-  onQuestionCreated?: () => void; // para refrescar lista si se necesita
+  challengeId?: string;
+  onQuestionCreated?: () => void;
 }
 
 function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
@@ -11,7 +11,19 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
   const [description, setDescription] = useState("");
   const [responseType, setResponseType] = useState("text");
   const [allowCustomText, setAllowCustomText] = useState(false);
+  const [options, setOptions] = useState<string[]>(["", "", ""]); // por defecto 3 opciones
   const [loading, setLoading] = useState(false);
+
+  const handleOptionChange = (index: number, value: string) => {
+    const newOptions = [...options];
+    newOptions[index] = value;
+    setOptions(newOptions);
+  };
+
+  const addOption = () => setOptions([...options, ""]);
+  const removeOption = (index: number) => {
+    setOptions(options.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +48,10 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
           description,
           responseType,
           allowCustomText,
+          options:
+            responseType === "multiple-choice"
+              ? options.filter((o) => o.trim() !== "").map((o) => ({ text: o }))
+              : undefined,
         }),
       });
 
@@ -52,9 +68,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
       setDescription("");
       setResponseType("text");
       setAllowCustomText(false);
-
-      // trigger callback
-      onQuestionCreated?.();
+      setOptions(["", "", ""]);
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "❌ Error creating question");
@@ -64,13 +78,16 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="text-left space-y-4 p-4 font-mono font-semibold text-gray-600 text-sm w-full ">
+    <form
+      onSubmit={handleSubmit}
+      className="text-left space-y-4 p-4 font-mono font-semibold text-gray-600 text-sm w-full h-[350px] overflow-y-auto"
+    >
       <div>
         <label className="block">Question Text</label>
         <input
           type="text"
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           className="bg-[#fbf7f1] w-full border shadow px-3 py-2 rounded mt-1"
           required
         />
@@ -80,7 +97,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
         <label className="block">Description</label>
         <textarea
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           className="bg-[#fbf7f1] w-full border shadow px-3 py-2 rounded mt-1"
         />
       </div>
@@ -89,7 +106,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
         <label className="block">Response Type</label>
         <select
           value={responseType}
-          onChange={e => setResponseType(e.target.value)}
+          onChange={(e) => setResponseType(e.target.value)}
           className="bg-[#fbf7f1] w-full border shadow px-3 py-2 rounded mt-1"
         >
           <option value="text">Text</option>
@@ -98,20 +115,57 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
         </select>
       </div>
 
+      {/* Opciones dinámicas si es multiple-choice */}
+      {responseType === "multiple-choice" && (
+        <div>
+          <label className="block mb-2">Options</label>
+          {options.map((opt, idx) => (
+            <div key={idx} className="flex items-center gap-2 mb-2">
+              <input
+                type="text"
+                value={opt}
+                onChange={(e) => handleOptionChange(idx, e.target.value)}
+                className="bg-[#fbf7f1] flex-1 border shadow px-3 py-2 rounded"
+                placeholder={`Option ${idx + 1}`}
+                required
+              />
+              {options.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeOption(idx)}
+                  className="text-gray-500 font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addOption}
+            className="mt-2 text-gray-500 text-sm underline"
+          >
+            ➕ Add Option
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center gap-2">
         <input
           type="checkbox"
           checked={allowCustomText}
-          onChange={e => setAllowCustomText(e.target.checked)}
+          onChange={(e) => setAllowCustomText(e.target.checked)}
           id="allowCustomText"
         />
-        <label htmlFor="allowCustomText" className="text-sm">Allow Custom Text</label>
+        <label htmlFor="allowCustomText" className="text-sm">
+          Allow Custom Text
+        </label>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className=" bg-gray-400 text-m font-mono text-white mb-4 hover:bg-slate-500"
+        className="bg-gray-400 text-m font-mono text-white mb-4 hover:bg-slate-500"
       >
         {loading ? "Saving..." : "Save Question"}
       </button>

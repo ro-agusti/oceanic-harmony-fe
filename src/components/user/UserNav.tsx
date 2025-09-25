@@ -7,8 +7,8 @@ export default function UserNav() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-[#f8f1e8] z-50 border-b border-gray-300 p-4">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+   <nav className="fixed top-0 left-0 w-full bg-[#f8f1e8] z-50 border-b border-gray-300">
+  <div className="max-w-screen-lg mx-auto flex justify-between items-center p-4">
         {/* Logo → Home del usuario */}
         <button onClick={() => navigate("/user")}>
           <img src="/logoWave.png" className="h-10" alt="Oceanic Harmony logo" />

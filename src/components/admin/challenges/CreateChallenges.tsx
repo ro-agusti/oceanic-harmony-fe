@@ -8,6 +8,7 @@ function CreateChallenge() {
   const [price, setPrice] = useState("");
   const [days, setDays] = useState(0);
   const navigate = useNavigate();
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +31,13 @@ function CreateChallenge() {
       console.log("Response del backend:", data);
 
       if (response.ok) {
-        navigate(`/admin/assign-questions/${data.challenge.id}`);
-      } else {
-        console.error(data.error);
-      }
+  navigate(`/admin/challenge-manager/${data.challenge.id}`, {
+    state: {
+      success: true,
+      challengeName: data.challenge.title,
+    },
+  });
+}
      
     } catch (error) {
       console.error("Error:", error);
@@ -107,7 +111,7 @@ function CreateChallenge() {
   {/* SUBMIT BUTTON */}
   <button
     type="submit"
-    className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+    className="bg-gray-400 font-bold text-white px-4 py-2 rounded hover:bg-gray-500"
   >
     Create and select questions
   </button>
