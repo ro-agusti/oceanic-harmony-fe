@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft} from "lucide-react";
 import AdminNav from "../AdminNav";
 
 function CreateChallenge() {
@@ -47,8 +48,21 @@ function CreateChallenge() {
   return (
     <>
       <AdminNav />
-    <div className="p-6 max-w-xl mx-auto mt-20">
-      <h1 className="text-2xl font-bold text-gray-700 font-mono mb-4">Let's create a new challenge</h1>
+     
+    <div className="p-6 max-w-xl mx-auto mt-20 bg-white">
+      <div className="flex justify-between items-start mb-4">
+  <h1 className="text-2xl font-bold text-gray-700 font-mono">
+    Let's create a new challenge
+  </h1>
+  <button
+          onClick={() => navigate("/admin/challenges")}
+          className="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 flex items-center gap-2"
+        >
+          <ArrowLeft size={20} />
+        </button>
+</div>
+
+      
      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
   {/* TITLE */}
@@ -115,6 +129,7 @@ function CreateChallenge() {
   >
     Create and select questions
   </button>
+  
 
 </form>
     </div>

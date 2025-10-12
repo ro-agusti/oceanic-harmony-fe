@@ -17,6 +17,7 @@ import HomeUser from './components/user/HomeUser'
 import ChallengeResponses from './components/user/ChallengeResponses'
 import { Toaster } from 'react-hot-toast';
 import MyChallenges from './components/user/MyChallenges'
+import QuestionManager from './components/admin/questions/QuestionManager'
 
 //import Journals from './components/admin/Journals'
 //import Questions from './components/admin/Questions'
@@ -36,10 +37,11 @@ function App() {
       <Route path="/admin/create-challenge" element={<CreateChallenge />} />
       <Route path="/admin/edit-challenge/:challengeId" element={<EditChallenge />} />
       <Route path="/admin/challenge-manager/:challengeId" element={<ChallengeManager />} />
+      <Route path="/admin/questions" element={<QuestionManager />} />
       <Route path="/user" element={<HomeUser />} />
       <Route path="/user/my-challenges" element={<MyChallenges />} />
-      {/* <Route path="user/challenge-responses/:challengeId" element={<ChallengeResponses />} /> */}
       <Route path="/user/challenge-responses/:userChallengeId" element={<ChallengeResponses />} />
+      
       {/* <Route path="/admin/assign-questions/:challengeId" element={<ChallengeQuestionList />} /> */}
       {/* <Route path="/admin/challenges/:challengeId/select-questions" element={<SelectQuestionsChallenge />} /> */}
 

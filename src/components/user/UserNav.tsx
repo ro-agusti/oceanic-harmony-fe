@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function UserNav() {
@@ -26,19 +26,25 @@ export default function UserNav() {
           } md:flex flex-col md:flex-row gap-4 md:static bg-transparent shadow-md md:shadow-none p-4 md:p-0`}
         >
           <button
-            className="text-gray-700 hover:underline font-mono"
+            className="flex items-center gap-2 text-gray-500 hover:underline"
+            onClick={() => navigate("/user")}
+          >
+            <Plus size={20} />Dashboard
+          </button>
+          <button
+            className="flex items-center gap-2 text-gray-500 hover:underline"
             onClick={() => navigate("/user/my-challenges")}
           >
-            My Challenges
+            <Plus size={20} />My Challenges
           </button>
           <button
-            className="text-gray-700 hover:underline font-mono"
+            className="flex items-center gap-2 text-gray-500 hover:underline"
             onClick={() => navigate("/user/select-challenge")}
           >
-            Select Challenge
+            <Plus size={20} />Select Challenge
           </button>
           <button
-            className="flex items-center gap-2 text-red-500 hover:underline font-mono"
+            className="flex items-center gap-2 text-red-500 hover:underline"
             onClick={() => {
               localStorage.removeItem("token");
               navigate("/");

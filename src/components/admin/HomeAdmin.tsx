@@ -27,19 +27,25 @@ function HomeAdmin() {
           onClick={() => navigate("/admin/challenges")}
           className="w-full py-4 text-xl font-semibold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition"
         >
-          Challenges
+          Journals Manager
         </button>
-        <button
+        {/* <button
           onClick={() => navigate("/admin/Journals")}
           className="w-full py-4 text-xl font-semibold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition"
         >
           Journals
-        </button>
+        </button> */}
         <button
           onClick={() => navigate("/admin/Questions")}
           className="w-full py-4 text-xl font-semibold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition"
         >
-          Questions
+          Questions Manager
+        </button>
+        <button
+          onClick={() => navigate("/challenges")}
+          className="w-full py-4 text-xl font-semibold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition"
+        >
+          Journals
         </button>
         <button
           onClick={() => {

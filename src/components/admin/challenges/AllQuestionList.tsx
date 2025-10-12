@@ -20,19 +20,27 @@ interface Question {
 }
 
 interface AllQuestionsListProps {
-  challengeId: string;
-  onSelectQuestion: (questionId: string) => void;
+  challengeId?: string;
+  onSelectQuestion?: (questionId: string) => void;
   refreshSignal?: number;
   challengeData?: ChallengeData;
-  selectedQuestions: SelectedQuestion[];
+  selectedQuestions?: SelectedQuestion[];
 }
+
+// interface AllQuestionsListProps {
+//   challengeId: string;
+//   onSelectQuestion: (questionId: string) => void;
+//   refreshSignal?: number;
+//   challengeData?: ChallengeData;
+//   selectedQuestions: SelectedQuestion[];
+// }
 
 export default function AllQuestionsList({
   challengeId,
   onSelectQuestion,
-  refreshSignal,
+  refreshSignal = 0,
   challengeData,
-  selectedQuestions,
+  selectedQuestions = [], // ✅ valor por defecto
 }: AllQuestionsListProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,26 +156,26 @@ export default function AllQuestionsList({
   if (questions.length === 0) return <p>No questions created yet.</p>;
 
   return (
-    <div className="p-4 w-full h-[350px] overflow-y-auto">
+    <div className="p-4 w-full  overflow-y-auto">
       <ul className="space-y-2 text-left font-mono">
         {questions.map((q) => (
           <li key={q.id} className="relative">
             <div className="flex items-center justify-between gap-2 border shadow p-3 rounded w-full">
-              <div className="flex-1">
+             <div className="flex-1">
                 {editingId === q.id ? (
                   <>
                     <input
                       type="text"
                       value={editData.text || ""}
                       onChange={(e) => setEditData({ ...editData, text: e.target.value })}
-                      className="border bg-transparent px-2 py-1 rounded w-full text-sm mb-1"
+                      className="border bg-white px-2 py-1 rounded w-full text-sm mb-1"
                       placeholder="Question text"
                     />
                     <input
                       type="text"
                       value={editData.description || ""}
                       onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                      className="border bg-transparent px-2 py-1 rounded w-full text-sm mb-1"
+                      className="border bg-white px-2 py-1 rounded w-full text-sm mb-1"
                       placeholder="Description"
                     />
 
@@ -179,7 +187,7 @@ export default function AllQuestionsList({
                           onChange={(e) =>
                             setEditData({ ...editData, responseType: e.target.value, options: [] })
                           }
-                          className="border bg-transparent px-2 py-1 rounded text-xs"
+                          className="border bg-white px-2 py-1 rounded text-xs"
                         >
                           <option value="">-- Select type --</option>
                           <option value="text">Text</option>
@@ -212,7 +220,7 @@ export default function AllQuestionsList({
                                 newOptions[idx].optionText = e.target.value;
                                 setEditData({ ...editData, options: newOptions });
                               }}
-                              className="border bg-transparent px-2 py-1 rounded text-xs flex-1"
+                              className="border bg-white px-2 py-1 rounded text-xs flex-1"
                               placeholder={`Option ${idx + 1}`}
                             />
                             <button
@@ -285,29 +293,62 @@ export default function AllQuestionsList({
                 </button>
                 
               </div>
-              <button
-                  onClick={() => setModalQuestionId(q.id)}
-                  className="bg-gray-400 text-white px-2 py-1 font-bold text-xs rounded hover:bg-gray-500"
-                >
-                  <PlusCircle size={16} />
-                </button>
-            </div>
+             
+    {challengeId && onSelectQuestion && (
+  <button
+    onClick={() => {
+      const alreadyAssigned = selectedQuestions.some(
+        (sq) => sq.question.id === q.id
+      );
 
-            {modalQuestionId === q.id && (
-              <AssignToChallengeModal
-                questionId={modalQuestionId}
-                questionText={q.text}
-                questionDescription={q.description}
-                challengeId={challengeId}
-                challengeData={challengeData}
-                selectedQuestions={selectedQuestions}
-                onClose={() => setModalQuestionId(null)}
-                onAssigned={() => {
-                  onSelectQuestion(q.id);
-                  setModalQuestionId(null);
-                }}
-              />
-            )}
+      if (alreadyAssigned) {
+        toast.error("This question is already assigned to this challenge.");
+        return;
+      }
+
+      setModalQuestionId(q.id);
+    }}
+    className="bg-gray-400 text-white px-2 py-1 font-bold text-xs rounded hover:bg-gray-500"
+  >
+    <PlusCircle size={16} />
+  </button>
+)}
+      
+{/* <button
+  onClick={() => {
+    if (!challengeId || !onSelectQuestion) return; // 🔹 proteger
+
+    const alreadyAssigned = selectedQuestions.some(
+      (sq) => sq.question.id === q.id
+    );
+
+    if (alreadyAssigned) {
+      toast.error("This question is already assigned to this challenge.");
+      return;
+    }
+
+    setModalQuestionId(q.id);
+  }}
+  className="bg-gray-400 text-white px-2 py-1 font-bold text-xs rounded hover:bg-gray-500"
+>
+  <PlusCircle size={16} />
+</button> */}
+ </div>
+          {modalQuestionId && challengeId && onSelectQuestion && (
+  <AssignToChallengeModal
+    questionId={modalQuestionId}
+    questionText={q.text}
+    questionDescription={q.description}
+    challengeId={challengeId}
+    challengeData={challengeData}
+    selectedQuestions={selectedQuestions}
+    onClose={() => setModalQuestionId(null)}
+    onAssigned={() => {
+      onSelectQuestion(q.id);
+      setModalQuestionId(null);
+    }}
+  />
+)}
           </li>
         ))}
       </ul>

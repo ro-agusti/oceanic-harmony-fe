@@ -30,6 +30,8 @@ interface Props {
   onSelectedQuestionsLoaded?: (questions: SelectedQuestion[]) => void;
 }
 
+type Category = "daily" | "daily-reflection" | "weekly-reflection" | "challenge-reflection";
+
 function SelectedQuestionsList({
   challengeId,
   refreshSignal,
@@ -44,7 +46,6 @@ function SelectedQuestionsList({
     day: 0,
     questionCategory: "",
   });
-  
 
   const fetchSelectedQuestions = async () => {
     try {
@@ -59,9 +60,9 @@ function SelectedQuestionsList({
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch selected questions");
 
-      let formatted: SelectedQuestion[] = [];
-      if (data.challenge && Array.isArray(data.challenge.ChallengeQuestions)) {
-        formatted = data.challenge.ChallengeQuestions.map((item: any) => ({
+      // 🔹 Mapear y tipar correctamente
+      const formatted: SelectedQuestion[] = (data.challenge?.ChallengeQuestions || [])
+        .map((item: any) => ({
           question: {
             id: item.Question.id,
             text: item.Question.text,
@@ -71,9 +72,10 @@ function SelectedQuestionsList({
           day: item.day,
           week: item.week,
           questionCategory: item.questionCategory,
-        }));
-        formatted.sort((a, b) => (a.week === b.week ? a.day - b.day : a.week - b.week));
-      }
+        }))
+        .sort((a: SelectedQuestion, b: SelectedQuestion) =>
+          a.week === b.week ? a.day - b.day : a.week - b.week
+        );
 
       setSelectedQuestions(formatted);
       if (onSelectedQuestionsLoaded) onSelectedQuestionsLoaded(formatted);
@@ -109,8 +111,6 @@ function SelectedQuestionsList({
       toast.error(err.message || "Error deleting question");
     }
   };
-
-  type Category = "daily" | "daily-reflection" | "weekly-reflection" | "challenge-reflection";
 
   const handleEditSave = async (questionId: string) => {
     if (!challengeData || !editData || !editData.questionCategory || editData.day === 0)
@@ -148,7 +148,7 @@ function SelectedQuestionsList({
       return toast.error(`Cannot have more than ${limits[category]} questions for category "${category}".`);
     }
 
-    // Guardar
+    // Guardar cambios
     const token = localStorage.getItem("token");
     if (!token) return toast.error("Admin token not found");
 
@@ -192,20 +192,26 @@ function SelectedQuestionsList({
           let availableDays: number[] = [];
           if (editingId === item.question.id && editData.questionCategory && challengeData) {
             const category = editData.questionCategory as Category;
-            if (category === "weekly-reflection") availableDays = Array.from({ length: challengeData.weeks }, (_, i) => (i + 1) * 7);
-            else if (category === "challenge-reflection") availableDays = [challengeData.days];
+            if (category === "weekly-reflection")
+              availableDays = Array.from({ length: challengeData.weeks }, (_, i) => (i + 1) * 7);
+            else if (category === "challenge-reflection")
+              availableDays = [challengeData.days];
             else availableDays = Array.from({ length: challengeData.days }, (_, i) => i + 1);
 
             // Filtrar días ya ocupados
-            availableDays = availableDays.filter(d =>
-              !selectedQuestions.some(
-                q => q.questionCategory === category && q.day === d && q.question.id !== item.question.id
-              )
+            availableDays = availableDays.filter(
+              (d) =>
+                !selectedQuestions.some(
+                  (q) => q.questionCategory === category && q.day === d && q.question.id !== item.question.id
+                )
             );
           }
 
           return (
-            <li key={item.question.id} className="grid grid-cols-9 gap-1 items-center border font-mono p-3 rounded shadow-sm">
+            <li
+              key={item.question.id}
+              className="grid grid-cols-9 gap-1 items-center border font-mono p-3 rounded shadow-sm"
+            >
               <div className="font-mono col-span-1">{index + 1}</div>
               <div className="text-left col-span-5">
                 <p className="text-sm font-semibold text-gray-600">{item.question.text}</p>
@@ -227,7 +233,9 @@ function SelectedQuestionsList({
                     <option value="weekly-reflection">Weekly Reflection</option>
                     <option value="challenge-reflection">Challenge Reflection</option>
                   </select>
-                ) : item.questionCategory}
+                ) : (
+                  item.questionCategory
+                )}
               </div>
 
               {/* Columna día */}
@@ -239,24 +247,34 @@ function SelectedQuestionsList({
                       onChange={(e) => setEditData({ ...editData, day: Number(e.target.value) })}
                       className="border px-2 py-1 rounded w-full bg-transparent"
                     >
-                      {availableDays.map(d => (
-                        <option key={d} value={d}>{d}</option>
+                      {availableDays.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
                       ))}
                     </select>
                   ) : (
                     <span className="text-gray-400">Select category first</span>
                   )
-                ) : `Day ${item.day}`}
+                ) : (
+                  `Day ${item.day}`
+                )}
               </div>
 
               {/* Botones */}
               <div className="flex justify-end gap-2 col-span-1">
                 {editingId === item.question.id ? (
                   <>
-                    <button onClick={() => handleEditSave(item.question.id)} className="px-2 py-1 bg-gray-400 text-white rounded">
+                    <button
+                      onClick={() => handleEditSave(item.question.id)}
+                      className="px-2 py-1 bg-gray-400 text-white rounded"
+                    >
                       <Save size={16} />
                     </button>
-                    <button onClick={() => setEditingId(null)} className="px-2 py-1 bg-gray-400 text-white rounded">
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="px-2 py-1 bg-gray-400 text-white rounded"
+                    >
                       <X size={16} />
                     </button>
                   </>
@@ -271,7 +289,10 @@ function SelectedQuestionsList({
                     >
                       <Edit size={16} />
                     </button>
-                    <button onClick={() => handleDelete(item.question.id)} className="px-2 py-1 bg-gray-400 text-white rounded">
+                    <button
+                      onClick={() => handleDelete(item.question.id)}
+                      className="px-2 py-1 bg-gray-400 text-white rounded"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </>

@@ -176,9 +176,9 @@ export default function AssignToChallengeModal({
   // };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-        <h2 className="text-lg font-bold mb-4">Assign Question</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 isolation-isolate">
+    <div className="bg-white bg-opacity-100 p-6 rounded-lg shadow-lg w-80">
+      <h2 className="text-lg font-bold mb-4">Assign Question</h2>
 
         <div className="mb-4 p-2 border-b border-gray-200">
           <p className="text-sm font-semibold text-gray-700">{questionText}</p>
@@ -226,7 +226,7 @@ export default function AssignToChallengeModal({
           <button
             onClick={handleSave}
             disabled={loading}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
           >
             {loading ? "Saving..." : "Save"}
           </button>

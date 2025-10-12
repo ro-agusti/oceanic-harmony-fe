@@ -30,21 +30,27 @@ function AdminNav() {
         >
           <button
             className="flex items-center gap-2 text-gray-500 hover:underline"
-            onClick={() => navigate("/admin/new-challenge")}
+            onClick={() => navigate("/admin")}
           >
             <Plus size={20} /> Dashboard
           </button>
           <button
             className="flex items-center gap-2 text-gray-500 hover:underline"
-            onClick={() => navigate("/admin/new-challenge")}
+            onClick={() => navigate("/admin/challenges")}
           >
-            <Plus size={20} /> Journals
+            <Plus size={20} /> Journals Manager
           </button>
           <button
             className="flex items-center gap-2 text-gray-500 hover:underline"
             onClick={() => navigate("/admin/questions")}
           >
-            <HelpCircle size={20} /> Questions
+            <Plus size={20} /> Questions Manager
+          </button>
+          <button
+            className="flex items-center gap-2 text-gray-500 hover:underline"
+            onClick={() => navigate("/challenges")}
+          >
+            <HelpCircle size={20} /> Journals
           </button>
           <button
             className="flex items-center gap-2 text-red-500 hover:underline"

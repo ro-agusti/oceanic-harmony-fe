@@ -231,15 +231,7 @@ function Challenges() {
           </ul>
         </div>
 
-        <button
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-          onClick={() => {
-            localStorage.removeItem("token");
-            navigate("/");
-          }}
-        >
-          Cerrar sesión
-        </button>
+        
       </div>
     </>
   ) : null;
