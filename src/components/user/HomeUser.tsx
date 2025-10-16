@@ -79,13 +79,13 @@ export default function UserDashboard() {
             onClick={() => navigate("/user/my-challenges")}
             className="w-full py-4 text-xl font-semibold text-white bg-gray-400 rounded-lg shadow-lg hover:bg-gray-500 transition"
           >
-            My Challenges
+            My Journals
           </button>
           <button
             onClick={() => navigate("/challenges")}
             className="w-full py-4 text-xl font-semibold text-white bg-gray-400 rounded-lg shadow-lg hover:bg-gray-500 transition"
           >
-            Select Challenge
+            Select Journal
           </button>
           <button
             onClick={() => {

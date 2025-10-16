@@ -48,6 +48,12 @@ function HomeAdmin() {
           Journals
         </button>
         <button
+          onClick={() => navigate("/user/my-challenges")}
+          className="w-full py-4 text-xl font-semibold text-white bg-gray-500 rounded-lg shadow-lg hover:bg-gray-600 transition"
+        >
+          My Journals
+        </button>
+        <button
           onClick={() => {
             localStorage.removeItem("token");
             navigate("/");

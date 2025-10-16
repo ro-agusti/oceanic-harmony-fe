@@ -35,13 +35,13 @@ export default function UserNav() {
             className="flex items-center gap-2 text-gray-500 hover:underline"
             onClick={() => navigate("/user/my-challenges")}
           >
-            <Plus size={20} />My Challenges
+            <Plus size={20} />My Journals
           </button>
           <button
             className="flex items-center gap-2 text-gray-500 hover:underline"
-            onClick={() => navigate("/user/select-challenge")}
+            onClick={() => navigate("/challenges")}
           >
-            <Plus size={20} />Select Challenge
+            <Plus size={20} />Select Journal
           </button>
           <button
             className="flex items-center gap-2 text-red-500 hover:underline"
