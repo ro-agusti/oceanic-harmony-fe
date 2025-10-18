@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { ChallengeData, SelectedQuestion } from "../types/typesChallenges";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface AssignToChallengeModalProps {
   questionId: string;
   questionText: string;
@@ -83,7 +84,7 @@ export default function AssignToChallengeModal({
         questions: [{ questionId, questionCategory, week, day }],
       };
 
-      const res = await fetch(`http://localhost:3000/api/challenge-questions`, {
+      const res = await fetch(`${API_URL}/api/challenge-questions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,6 +92,14 @@ export default function AssignToChallengeModal({
         },
         body: JSON.stringify(payload),
       });
+      // const res = await fetch(`http://localhost:3000/api/challenge-questions`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      //   body: JSON.stringify(payload),
+      // });
 
       if (!res.ok) {
         const error = await res.json();

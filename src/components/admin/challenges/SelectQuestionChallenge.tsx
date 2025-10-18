@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Circle, Check, Save, PlusCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface Question {
   id: string;
   text: string;
@@ -31,7 +32,7 @@ function SelectQuestionsChallenge() {
     const token = localStorage.getItem("token");
 
     const fetchQuestions = async () => {
-      const res = await fetch("http://localhost:3000/api/questions", {
+      const res = await fetch(`${API_URL}/api/questions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,7 +52,7 @@ function SelectQuestionsChallenge() {
     if (!challengeId) return;
 
     const fetchSelected = async () => {
-      const res = await fetch(`http://localhost:3000/api/challenge-questions/${challengeId}`, {
+      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -153,7 +154,7 @@ function SelectQuestionsChallenge() {
 
   try {
     for (const item of payload) {
-      const res = await fetch("http://localhost:3000/api/challenge-questions", {
+      const res = await fetch(`${API_URL}/api/challenge-questions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

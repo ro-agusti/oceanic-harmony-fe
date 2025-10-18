@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import UserNav from "./UserNav";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface Option {
   id: string;
   text: string;
@@ -44,7 +45,7 @@ export default function ChallengeResponses() {
 
       try {
         const res = await fetch(
-          `http://localhost:3000/api/user-responses/${userChallengeId}`,
+          `${API_URL}/api/user-responses/${userChallengeId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!res.ok) throw new Error("Failed to fetch responses");
@@ -78,7 +79,7 @@ export default function ChallengeResponses() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/user-responses/${userChallengeId}`,
+        `${API_URL}/api/user-responses/${userChallengeId}`,
         {
           method: "POST",
           headers: {

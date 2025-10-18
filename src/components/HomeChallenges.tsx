@@ -4,6 +4,8 @@ import AdminNav from "./admin/AdminNav";
 import UserNav from "./user/UserNav";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface Challenge {
   id: string;
   title: string;
@@ -42,7 +44,7 @@ export default function HomeChallenges() {
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/challenge");
+        const res = await fetch(`${API_URL}/api/challenge`);
         const data = await res.json();
         setChallenges(data.challenges);
       } catch (error) {
@@ -61,7 +63,7 @@ export default function HomeChallenges() {
       if (!token) return;
 
       try {
-        const res = await fetch("http://localhost:3000/api/user-challenges", {
+        const res = await fetch(`${API_URL}/api/user-challenges`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -89,7 +91,7 @@ export default function HomeChallenges() {
     }
 
     try {
-      const postRes = await fetch("http://localhost:3000/api/user-challenges", {
+      const postRes = await fetch(`${API_URL}/api/user-challenges`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

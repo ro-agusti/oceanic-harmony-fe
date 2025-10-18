@@ -1,6 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface CreateQuestionFormProps {
   challengeId?: string;
   onQuestionCreated?: () => void;
@@ -37,7 +38,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/questions", {
+      const res = await fetch(`${API_URL}/api/questions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

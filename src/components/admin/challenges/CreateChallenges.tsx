@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft} from "lucide-react";
 import AdminNav from "../AdminNav";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function CreateChallenge() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -19,7 +21,7 @@ function CreateChallenge() {
 
     try {
       
-      const response = await fetch("http://localhost:3000/api/challenge", {
+      const response = await fetch(`${API_URL}/api/challenge`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,6 +29,15 @@ function CreateChallenge() {
         },
         body: JSON.stringify({ title, description, price, days }),
       });
+
+      // const response = await fetch("http://localhost:3000/api/challenge", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      //   body: JSON.stringify({ title, description, price, days }),
+      // });
 
       const data = await response.json();
       console.log("Response del backend:", data);

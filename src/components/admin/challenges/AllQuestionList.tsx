@@ -4,6 +4,8 @@ import { Pencil, Trash2, PlusCircle, Save } from "lucide-react";
 import AssignToChallengeModal from "./AssignToChallengeForm";
 import { SelectedQuestion, ChallengeData } from "../types/typesChallenges";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface MultipleChoiceOption {
   id?: string;
   optionText: string;
@@ -55,9 +57,13 @@ export default function AllQuestionsList({
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No admin token found");
 
-      const res = await fetch("http://localhost:3000/api/questions", {
+      const res = await fetch(`${API_URL}/api/questions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      // const res = await fetch("http://localhost:3000/api/questions", {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
       const data = await res.json();
       if (!Array.isArray(data)) return setQuestions([]);
 
@@ -106,7 +112,7 @@ export default function AllQuestionsList({
             : undefined,
       };
 
-      const res = await fetch(`http://localhost:3000/api/questions/${id}`, {
+      const res = await fetch(`${API_URL}/api/questions/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -114,6 +120,15 @@ export default function AllQuestionsList({
         },
         body: JSON.stringify(payload),
       });
+
+      // const res = await fetch(`http://localhost:3000/api/questions/${id}`, {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      //   body: JSON.stringify(payload),
+      // });
 
       if (!res.ok) {
         const error = await res.json();
@@ -135,10 +150,14 @@ export default function AllQuestionsList({
 
     try {
       setDeleting(id);
-      const res = await fetch(`http://localhost:3000/api/questions/${id}`, {
+      const res = await fetch(`${API_URL}/api/questions/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+      // const res = await fetch(`http://localhost:3000/api/questions/${id}`, {
+      //   method: "DELETE",
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || "Failed to delete question");

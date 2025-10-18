@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import UserNav from "./UserNav";
 import AdminNav from "../admin/AdminNav";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface Challenge {
   id: string;
   title: string;
@@ -46,7 +48,7 @@ export default function MyChallenges() {
 
     const fetchUserChallenges = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/user-challenges", {
+        const res = await fetch(`${API_URL}/api/user-challenges`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -88,7 +90,7 @@ export default function MyChallenges() {
     setLoadingQuestions((prev) => ({ ...prev, [challengeId]: true }));
 
     try {
-      const res = await fetch(`http://localhost:3000/api/challenge-questions/${challengeId}`, {
+      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch questions");

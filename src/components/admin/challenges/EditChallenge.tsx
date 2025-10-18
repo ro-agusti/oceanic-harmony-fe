@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 //import { Challenge } from '../types/challenge';
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface Challenge {
   id: string;
   title: string;
@@ -27,7 +28,7 @@ export default function EditChallenge() {
       if (!token || !challengeId) return;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/challenge/${challengeId}`, {
+        const response = await fetch(`${API_URL}/api/challenge/${challengeId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -75,7 +76,7 @@ export default function EditChallenge() {
     if (!token) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/challenge/${challengeId}`, {
+      const response = await fetch(`${API_URL}/api/challenge/${challengeId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

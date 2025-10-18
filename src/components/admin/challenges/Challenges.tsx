@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash2, PlusCircle, HelpCircle } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface Challenge {
   id: string;
   title: string;
@@ -47,13 +48,22 @@ function Challenges() {
         setIsAdmin(true);
 
         const fetchChallenges = async () => {
+          
           try {
-            const response = await fetch("http://localhost:3000/api/challenge", {
+            const response = await fetch(`${API_URL}/api/challenge`, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             });
+
+          // try {
+          //   const response = await fetch("http://localhost:3000/api/challenge", {
+          //     headers: {
+          //       Authorization: `Bearer ${token}`,
+          //       "Content-Type": "application/json",
+          //     },
+          //   });
 
             if (!response.ok) throw new Error("Error al obtener challenges");
 
@@ -67,7 +77,7 @@ function Challenges() {
               challengesData.map(async (challenge: Challenge) => {
                 try {
                   const questionsResponse = await fetch(
-                    `http://localhost:3000/api/challenge-questions/${challenge.id}`,
+                    `${API_URL}/api/challenge-questions/${challenge.id}`,
                     {
                       headers: {
                         Authorization: `Bearer ${token}`,
@@ -75,6 +85,15 @@ function Challenges() {
                       },
                     }
                   );
+                  // const questionsResponse = await fetch(
+                  //   `http://localhost:3000/api/challenge-questions/${challenge.id}`,
+                  //   {
+                  //     headers: {
+                  //       Authorization: `Bearer ${token}`,
+                  //       "Content-Type": "application/json",
+                  //     },
+                  //   }
+                  // );
             
                   if (!questionsResponse.ok) throw new Error("Error al obtener preguntas");
             
@@ -128,13 +147,20 @@ function Challenges() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`http://localhost:3000/api/challenge/${id}`, {
+      const response = await fetch(`${API_URL}/api/challenge/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
+      // const response = await fetch(`http://localhost:3000/api/challenge/${id}`, {
+      //   method: "DELETE",
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     "Content-Type": "application/json",
+      //   },
+      // });
 
       if (!response.ok) throw new Error("Error al eliminar challenge");
 

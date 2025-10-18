@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import UserNav from "./UserNav";
+//import UserNav from "./UserNav";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface UserProfile {
   id: string;
@@ -23,7 +25,7 @@ export default function UserDashboard() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/profile", {
+        const res = await fetch(`${API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

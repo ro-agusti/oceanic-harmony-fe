@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Trash2, Edit, Save, X } from "lucide-react";
 import toast from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface SelectedQuestion {
   question: {
     id: string;
@@ -54,7 +55,7 @@ function SelectedQuestionsList({
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Admin token not found");
 
-      const res = await fetch(`http://localhost:3000/api/challenge-questions/${challengeId}`, {
+      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -97,7 +98,7 @@ function SelectedQuestionsList({
     if (!token) return toast.error("Admin token not found");
 
     try {
-      const res = await fetch(`http://localhost:3000/api/challenge-questions/${challengeId}/${questionId}`, {
+      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}/${questionId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -154,7 +155,7 @@ function SelectedQuestionsList({
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/challenge-questions/${challengeId}/${questionId}`,
+        `${API_URL}/api/challenge-questions/${challengeId}/${questionId}`,
         {
           method: "PUT",
           headers: {

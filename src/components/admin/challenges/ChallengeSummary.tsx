@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
 export interface ChallengeData {
   days: number;
   weeks: number;
@@ -47,7 +48,7 @@ const ChallengeSummary = ({ challengeId, onDataLoaded, refreshSignal }: Challeng
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Admin token not found");
 
-      const res = await fetch(`http://localhost:3000/api/challenge-questions/${challengeId}`, {
+      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
