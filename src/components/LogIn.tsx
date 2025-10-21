@@ -15,9 +15,9 @@ function LogIn() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
 
     try {
       const response = await fetch(`${API_URL}/api/login`, {
@@ -26,6 +26,7 @@ function LogIn() {
         body: JSON.stringify(formData),
       });
 
+      
       const data = await response.json();
       if (response.ok) {
         // setMessage('User registered successfully! Redirecting to login...');

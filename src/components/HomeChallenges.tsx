@@ -46,7 +46,12 @@ export default function HomeChallenges() {
       try {
         const res = await fetch(`${API_URL}/api/challenge`);
         const data = await res.json();
+        console.log("API URL:", API_URL);
         setChallenges(data.challenges);
+
+        
+        console.log("Fetched challenges:", data);
+
       } catch (error) {
         console.error("Error fetching challenges:", error);
       } finally {
@@ -137,7 +142,7 @@ export default function HomeChallenges() {
       {navType === "home" && <HomeNav />}
 
       <main className="mt-24">
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="p-6 max-w-xxl mx-auto">
           <h1 className="text-3xl font-semibold text-gray-700 mb-10 text-center">
             All Journals
           </h1>
