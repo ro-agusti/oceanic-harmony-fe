@@ -83,6 +83,7 @@ export default function AssignToChallengeModal({
         challengeId,
         questions: [{ questionId, questionCategory, week, day }],
       };
+      console.log("Request body:", payload);
 
       const res = await fetch(`${API_URL}/api/challenge-questions`, {
         method: "POST",
