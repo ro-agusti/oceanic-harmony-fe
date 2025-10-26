@@ -12,6 +12,7 @@ interface Challenge {
   description: string;
   price: string;
   days: number;
+  active: boolean;
 }
 
 export default function HomeChallenges() {
@@ -47,11 +48,14 @@ export default function HomeChallenges() {
         const res = await fetch(`${API_URL}/api/challenge`);
         const data = await res.json();
         console.log("API URL:", API_URL);
-        setChallenges(data.challenges);
-
         
         console.log("Fetched challenges:", data);
 
+         const activeChallenges = data.challenges.filter(
+        (ch: Challenge) => ch.active === true
+      );
+
+      setChallenges(activeChallenges);
       } catch (error) {
         console.error("Error fetching challenges:", error);
       } finally {

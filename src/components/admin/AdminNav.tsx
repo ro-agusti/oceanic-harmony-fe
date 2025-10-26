@@ -28,12 +28,12 @@ function AdminNav() {
             menuOpen ? "flex" : "hidden"
           } md:flex flex-col md:flex-row gap-4 md:static bg-transparent shadow-md md:shadow-none p-4 md:p-0`}
         >
-          <button
+          {/* <button
             className="flex items-center gap-2 text-gray-500 hover:underline"
             onClick={() => navigate("/admin")}
           >
             <Plus size={20} /> Dashboard
-          </button>
+          </button> */}
           <button
             className="flex items-center gap-2 text-gray-500 hover:underline"
             onClick={() => navigate("/admin/challenges")}
