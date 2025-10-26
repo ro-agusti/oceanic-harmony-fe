@@ -90,52 +90,117 @@ const ChallengeSummary = ({ challengeId, onDataLoaded, refreshSignal }: Challeng
 
   const expectedTotal = days * 2 + weeks + 1;
 
-  return (
+   return (
     <div className="p-4 rounded shadow font-mono text-sm text-gray-700 bg-[#fbf7f1]">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-xl font-semibold text-gray-800">CHALLENGE</h2>
-          <p>{title}</p>
+          <p className="text-base text-gray-700">{title}</p>
         </div>
         <button
           onClick={() => navigate("/admin/challenges")}
-          className="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 flex items-center gap-2"
+          className="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 flex items-center gap-2 w-full sm:w-auto justify-center"
         >
           <ArrowLeft size={20} />
+          <span className="hidden sm:inline">Back</span>
         </button>
       </div>
 
-      <div className="flex items-center justify-between mt-4">
-        <div className="w-20">
-          <p><strong>Days:</strong> {days}</p>
-          <p><strong>Weeks:</strong> {weeks}</p>
+      {/* Stats Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-4">
+        {/* Days / Weeks Info */}
+        <div className="flex flex-row sm:flex-col sm:w-24 gap-4 sm:gap-2 justify-between sm:justify-start">
+          <p>
+            <strong>Days:</strong> {days}
+          </p>
+          <p>
+            <strong>Weeks:</strong> {weeks}
+          </p>
         </div>
 
-        <div className="grid grid-cols-5 gap-3 text-xs mt-2">
-          <div className="bg-[#fbf7f1] rounded shadow p-2">
+        {/* Summary Boxes */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 text-xs w-full">
+          <div className="bg-[#fbf7f1] rounded shadow p-2 text-center">
             <p className="font-medium text-gray-600">Daily</p>
-            <p>{dailyCount} / {days}</p>
+            <p>
+              {dailyCount} / {days}
+            </p>
           </div>
-          <div className="bg-[#fbf7f1] rounded shadow p-2">
+          <div className="bg-[#fbf7f1] rounded shadow p-2 text-center">
             <p className="font-medium text-gray-600">Daily Reflection</p>
-            <p>{dailyReflectionCount} / {days}</p>
+            <p>
+              {dailyReflectionCount} / {days}
+            </p>
           </div>
-          <div className="bg-[#fbf7f1] rounded shadow p-2">
+          <div className="bg-[#fbf7f1] rounded shadow p-2 text-center">
             <p className="font-medium text-gray-600">Weekly Reflection</p>
-            <p>{weeklyReflectionCount} / {weeks}</p>
+            <p>
+              {weeklyReflectionCount} / {weeks}
+            </p>
           </div>
-          <div className="bg-[#fbf7f1] rounded shadow p-2">
+          <div className="bg-[#fbf7f1] rounded shadow p-2 text-center">
             <p className="font-medium text-gray-600">Challenge Reflection</p>
-            <p>{challengeReflectionCount} / 1</p>
+            <p>
+              {challengeReflectionCount} / 1
+            </p>
           </div>
-          <div className="bg-[#fbf7f1] rounded shadow p-2">
+          <div className="bg-[#fbf7f1] rounded shadow p-2 text-center">
             <p className="font-bold text-gray-600">Total selected:</p>
-            <p className="text-gray-600">{totalSelected} / {expectedTotal}</p>
+            <p className="text-gray-600">
+              {totalSelected} / {expectedTotal}
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
+  // return (
+  //   <div className="p-4 rounded shadow font-mono text-sm text-gray-700 bg-[#fbf7f1]">
+  //     <div className="flex items-center justify-between">
+  //       <div className="flex items-center gap-3">
+  //         <h2 className="text-xl font-semibold text-gray-800">CHALLENGE</h2>
+  //         <p>{title}</p>
+  //       </div>
+  //       <button
+  //         onClick={() => navigate("/admin/challenges")}
+  //         className="bg-gray-400 text-white p-2 rounded hover:bg-gray-500 flex items-center gap-2"
+  //       >
+  //         <ArrowLeft size={20} />
+  //       </button>
+  //     </div>
+
+  //     <div className="flex items-center justify-between mt-4">
+  //       <div className="w-20">
+  //         <p><strong>Days:</strong> {days}</p>
+  //         <p><strong>Weeks:</strong> {weeks}</p>
+  //       </div>
+
+  //       <div className="grid grid-cols-5 gap-3 text-xs mt-2">
+  //         <div className="bg-[#fbf7f1] rounded shadow p-2">
+  //           <p className="font-medium text-gray-600">Daily</p>
+  //           <p>{dailyCount} / {days}</p>
+  //         </div>
+  //         <div className="bg-[#fbf7f1] rounded shadow p-2">
+  //           <p className="font-medium text-gray-600">Daily Reflection</p>
+  //           <p>{dailyReflectionCount} / {days}</p>
+  //         </div>
+  //         <div className="bg-[#fbf7f1] rounded shadow p-2">
+  //           <p className="font-medium text-gray-600">Weekly Reflection</p>
+  //           <p>{weeklyReflectionCount} / {weeks}</p>
+  //         </div>
+  //         <div className="bg-[#fbf7f1] rounded shadow p-2">
+  //           <p className="font-medium text-gray-600">Challenge Reflection</p>
+  //           <p>{challengeReflectionCount} / 1</p>
+  //         </div>
+  //         <div className="bg-[#fbf7f1] rounded shadow p-2">
+  //           <p className="font-bold text-gray-600">Total selected:</p>
+  //           <p className="text-gray-600">{totalSelected} / {expectedTotal}</p>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default ChallengeSummary;
