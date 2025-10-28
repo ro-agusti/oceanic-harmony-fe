@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import UserNav from "./UserNav";
 import AdminNav from "../admin/AdminNav";
 import QuestionResponse from "./QuestionResponse";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../config/api';
 
 interface Option {
   id: string;
@@ -85,53 +84,7 @@ export default function ChallengeResponses() {
     fetchResponses();
   }, [navigate, userChallengeId]);
 
-  // const handleInputChange = (questionId: string, value: string) => {
-  //   setAnswers((prev) => ({ ...prev, [questionId]: value }));
-  // };
-
-  // const handleSubmit = async (questionId: string, selectedOptionId?: string) => {
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     navigate("/login");
-  //     return;
-  //   }
-
-  //   const responseValue = selectedOptionId || answers[questionId];
-  //   if (!responseValue) return;
-
-  //   try {
-  //     const res = await fetch(`${API_URL}/api/user-responses/${userChallengeId}`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify({
-  //         questionId,
-  //         responseText: !selectedOptionId ? responseValue : undefined,
-  //         selectedOptionId: selectedOptionId || undefined,
-  //       }),
-  //     });
-
-  //     if (!res.ok) throw new Error("Failed to submit response");
-
-  //     setResponses((prev) =>
-  //       prev.map((r) =>
-  //         r.questionId === questionId ? { ...r, answer: responseValue } : r
-  //       )
-  //     );
-
-  //     if (!selectedOptionId) setAnswers((prev) => ({ ...prev, [questionId]: "" }));
-
-  //     // Avanzar al siguiente
-  //     if (currentIndex < responses.length - 1) {
-  //       setDirection(1);
-  //       setCurrentIndex((prev) => prev + 1);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error submitting response:", err);
-  //   }
-  // };
+ 
 
   if (loading) return <p className="p-6 text-center">Loading responses...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
@@ -139,17 +92,7 @@ export default function ChallengeResponses() {
 
   const currentResponse = responses[currentIndex];
 
-  // const variants = {
-  //   enter: (direction: number) => ({
-  //     x: direction > 0 ? 300 : -300,
-  //     opacity: 0,
-  //   }),
-  //   center: { x: 0, opacity: 1 },
-  //   exit: (direction: number) => ({
-  //     x: direction > 0 ? -300 : 300,
-  //     opacity: 0,
-  //   }),
-  // };
+ 
 
   return (
     <div className="min-h-screen">
@@ -175,11 +118,11 @@ export default function ChallengeResponses() {
         </div>
       </div>
 
-      {/* Pregunta actual animada */}
+     
       <div className="max-w-5xl mx-auto px-6">
  <AnimatePresence custom={direction} initial={false}>
   <QuestionResponse
-    key={currentIndex} // importante: usar índice para que AnimatePresence funcione sin perder foco
+    key={currentIndex} 
     response={currentResponse}
     answerValue={answers[currentResponse.questionId] || ""}
     challengeId={userChallengeId!}
@@ -203,56 +146,6 @@ export default function ChallengeResponses() {
 
 </div>
 
-      {/* <div className="max-w-5xl mx-auto px-6">
-        <AnimatePresence custom={direction}>
-          <motion.div
-            key={currentResponse.id}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="border p-4 rounded-lg shadow-sm bg-[#fbf7f1]"
-          >
-            <p className="font-semibold mb-2">{currentResponse.question}</p>
-
-            {currentResponse.answer !== null ? (
-              <p className="text-gray-700">{currentResponse.answer}</p>
-            ) : currentResponse.questionType === "multiple-choice" ? (
-              <div className="flex flex-col gap-2 mt-2">
-                {currentResponse.options?.map((opt) => (
-                  <button
-                    key={opt.id}
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                    onClick={() => handleSubmit(currentResponse.questionId, opt.id)}
-                  >
-                    {opt.optionText || opt.text}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-2 flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Write your answer..."
-                  className="p-2 border rounded w-full bg-inherit"
-                  value={answers[currentResponse.questionId] || ""}
-                  onChange={(e) =>
-                    handleInputChange(currentResponse.questionId, e.target.value)
-                  }
-                />
-                <button
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                  onClick={() => handleSubmit(currentResponse.questionId)}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div> */}
     </div>
   );
 }

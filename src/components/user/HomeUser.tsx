@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import UserNav from "./UserNav";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../config/api';
 
 interface UserProfile {
   id: string;
@@ -53,19 +51,17 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col">
-    {/* <header className="">
-        <UserNav />
-      </header> */}
+    
       
       <main className="flex flex-col items-center min-h-screen">
-        {/* Logo */}
+       
         <img
           src={"/logoWave.png"}
           className="h-40 p-4 mx-auto"
           alt="Oceanic Harmony logo"
         />
 
-        {/* Presentación */}
+        
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-600 mb-2 p-5 font-mono">
             Welcome, {profile.name || "User"} 👋
@@ -75,7 +71,7 @@ export default function UserDashboard() {
           </p>
         </div>
 
-        {/* Botones principales */}
+       
         <div className="grid gap-6 w-full max-w-md">
           <button
             onClick={() => navigate("/user/my-challenges")}

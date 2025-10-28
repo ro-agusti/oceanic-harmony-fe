@@ -1,7 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../../config/api';
 interface CreateQuestionFormProps {
   challengeId?: string;
   onQuestionCreated?: () => void;
@@ -12,7 +11,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
   const [description, setDescription] = useState("");
   const [responseType, setResponseType] = useState("text");
   const [allowCustomText, setAllowCustomText] = useState(false);
-  const [options, setOptions] = useState<string[]>(["", "", ""]); // por defecto 3 opciones
+  const [options, setOptions] = useState<string[]>(["", "", ""]); 
   const [loading, setLoading] = useState(false);
 
   const handleOptionChange = (index: number, value: string) => {
@@ -64,7 +63,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
       toast.success("✅ Question created!");
       if (onQuestionCreated) onQuestionCreated();
 
-      // reset form
+     
       setText("");
       setDescription("");
       setResponseType("text");
@@ -116,7 +115,7 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
         </select>
       </div>
 
-      {/* Opciones dinámicas si es multiple-choice */}
+      
       {responseType === "multiple-choice" && (
         <div>
           <label className="block mb-2">Options</label>

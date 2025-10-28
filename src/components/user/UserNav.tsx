@@ -9,17 +9,17 @@ export default function UserNav() {
   return (
    <nav className="fixed top-0 left-0 w-full bg-[#f8f1e8] z-50 border-b border-gray-300">
   <div className="max-w-screen-lg mx-auto flex justify-between items-center p-4">
-        {/* Logo → Home del usuario */}
+        
         <button onClick={() => navigate("/user")}>
           <img src="/logoWave.png" className="h-10" alt="Oceanic Harmony logo" />
         </button>
 
-        {/* Botón hamburguesa (mobile) */}
+       
         <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
-        {/* Menú */}
+      
         <div
           className={`${
             menuOpen ? "flex" : "hidden"

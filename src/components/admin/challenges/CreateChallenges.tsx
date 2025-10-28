@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft} from "lucide-react";
 import AdminNav from "../AdminNav";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../../config/api';
 
 function CreateChallenge() {
   const [title, setTitle] = useState("");
@@ -16,9 +15,7 @@ function CreateChallenge() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-    // console.log("Token:", token);
-    // localStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjY1MDAwMi1mYjU4LTRiOTItOWM4Yi0xYTdmMzUyNWQ3OGQiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NDg2NjU1MjgsImV4cCI6MTc0ODY2OTEyOH0.3F4C2T4VMOGlAT7smmNv2pXXiPjlyk0dtYmXN83e19k");
-
+   
     try {
       
       const response = await fetch(`${API_URL}/api/challenge`, {
@@ -30,14 +27,6 @@ function CreateChallenge() {
         body: JSON.stringify({ title, description, price, days }),
       });
 
-      // const response = await fetch("http://localhost:3000/api/challenge", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      //   body: JSON.stringify({ title, description, price, days }),
-      // });
 
       const data = await response.json();
       console.log("Response del backend:", data);
@@ -76,7 +65,7 @@ function CreateChallenge() {
       
      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-  {/* TITLE */}
+  
   <div className="flex flex-col">
     <label className="text-left text-sm font-mono text-gray-600">Title</label>
     <input
@@ -89,7 +78,7 @@ function CreateChallenge() {
     />
   </div>
 
-  {/* DESCRIPTION */}
+  
   <div className="flex flex-col">
     <label className="text-left text-sm font-mono text-gray-600">Description</label>
     <textarea
@@ -101,7 +90,6 @@ function CreateChallenge() {
     />
   </div>
 
-  {/* PRICE & DURATION */}
   <div className="flex gap-4">
     {/* PRICE */}
     <div className="flex flex-col w-1/2">
@@ -119,7 +107,6 @@ function CreateChallenge() {
       </div>
     </div>
 
-    {/* DURATION */}
     <div className="flex flex-col w-1/2">
       <label className="text-left text-sm font-mono text-gray-600">Duration (days)</label>
       <input
@@ -133,7 +120,7 @@ function CreateChallenge() {
     </div>
   </div>
 
-  {/* SUBMIT BUTTON */}
+  
   <button
     type="submit"
     className="bg-gray-400 font-bold text-white px-4 py-2 rounded hover:bg-gray-500"

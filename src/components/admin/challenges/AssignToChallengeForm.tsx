@@ -1,8 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { ChallengeData, SelectedQuestion } from "../types/typesChallenges";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../../config/api';
 interface AssignToChallengeModalProps {
   questionId: string;
   questionText: string;
@@ -58,7 +57,6 @@ export default function AssignToChallengeModal({
         return toast.error("The challenge reflection must be assigned to the last day.");
       }
 
-      // 🔹 Nueva validación: evitar duplicados por categoría y día
       const duplicate = selectedQuestions.some(
         (q) =>
           q.questionCategory === questionCategory &&
@@ -93,14 +91,6 @@ export default function AssignToChallengeModal({
         },
         body: JSON.stringify(payload),
       });
-      // const res = await fetch(`http://localhost:3000/api/challenge-questions`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      //   body: JSON.stringify(payload),
-      // });
 
       if (!res.ok) {
         const error = await res.json();
@@ -157,34 +147,6 @@ export default function AssignToChallengeModal({
   ));
 };
 
-  // const renderDayOptions = () => {
-  //   if (!challengeData) return null;
-  //   const { days } = challengeData;
-  //   const weeks = Math.ceil(days / 7);
-
-  //   let options: number[] = [];
-  //   switch (questionCategory) {
-  //     case "daily":
-  //     case "daily-reflection":
-  //       options = Array.from({ length: days }, (_, i) => i + 1);
-  //       break;
-  //     case "weekly-reflection":
-  //       options = Array.from({ length: weeks }, (_, i) => (i + 1) * 7);
-  //       break;
-  //     case "challenge-reflection":
-  //       options = [days];
-  //       break;
-  //     default:
-  //       options = [];
-  //   }
-
-  //   return options.map((d) => (
-  //     <option key={d} value={d}>
-  //       Day {d}
-  //     </option>
-  //   ));
-  // };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 isolation-isolate">
     <div className="bg-white bg-opacity-100 p-6 rounded-lg shadow-lg w-80">
@@ -198,7 +160,7 @@ export default function AssignToChallengeModal({
         </div>
 
         <div className="flex flex-col gap-2 mb-4">
-          {/* 🔹 Primero categoría */}
+          
           <select
             value={questionCategory}
             onChange={(e) => {
@@ -214,7 +176,6 @@ export default function AssignToChallengeModal({
             <option value="challenge-reflection">Challenge Reflection</option>
           </select>
 
-          {/* 🔹 Luego día */}
           <select
             value={day}
             onChange={(e) => setDay(Number(e.target.value))}

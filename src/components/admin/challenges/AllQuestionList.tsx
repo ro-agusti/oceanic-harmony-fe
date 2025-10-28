@@ -3,8 +3,7 @@ import toast from "react-hot-toast";
 import { Pencil, Trash2, PlusCircle, Save } from "lucide-react";
 import AssignToChallengeModal from "./AssignToChallengeForm";
 import { SelectedQuestion, ChallengeData } from "../types/typesChallenges";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../../config/api';
 
 interface MultipleChoiceOption {
   id?: string;
@@ -29,20 +28,14 @@ interface AllQuestionsListProps {
   selectedQuestions?: SelectedQuestion[];
 }
 
-// interface AllQuestionsListProps {
-//   challengeId: string;
-//   onSelectQuestion: (questionId: string) => void;
-//   refreshSignal?: number;
-//   challengeData?: ChallengeData;
-//   selectedQuestions: SelectedQuestion[];
-// }
+
 
 export default function AllQuestionsList({
   challengeId,
   onSelectQuestion,
   refreshSignal = 0,
   challengeData,
-  selectedQuestions = [], // ✅ valor por defecto
+  selectedQuestions = [], 
 }: AllQuestionsListProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,9 +54,7 @@ export default function AllQuestionsList({
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // const res = await fetch("http://localhost:3000/api/questions", {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
+      
       const data = await res.json();
       if (!Array.isArray(data)) return setQuestions([]);
 
@@ -121,15 +112,6 @@ export default function AllQuestionsList({
         body: JSON.stringify(payload),
       });
 
-      // const res = await fetch(`http://localhost:3000/api/questions/${id}`, {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      //   body: JSON.stringify(payload),
-      // });
-
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || "Failed to update question");
@@ -154,10 +136,7 @@ export default function AllQuestionsList({
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      // const res = await fetch(`http://localhost:3000/api/questions/${id}`, {
-      //   method: "DELETE",
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || "Failed to delete question");
@@ -226,7 +205,7 @@ export default function AllQuestionsList({
                       </label>
                     </div>
 
-                    {/* Multiple choice options */}
+                    
                     {editData.responseType === "multiple-choice" && (
                       <div className="mt-2">
                         {(editData.options || []).map((opt, idx) => (
@@ -333,25 +312,6 @@ export default function AllQuestionsList({
   </button>
 )}
       
-{/* <button
-  onClick={() => {
-    if (!challengeId || !onSelectQuestion) return; // 🔹 proteger
-
-    const alreadyAssigned = selectedQuestions.some(
-      (sq) => sq.question.id === q.id
-    );
-
-    if (alreadyAssigned) {
-      toast.error("This question is already assigned to this challenge.");
-      return;
-    }
-
-    setModalQuestionId(q.id);
-  }}
-  className="bg-gray-400 text-white px-2 py-1 font-bold text-xs rounded hover:bg-gray-500"
->
-  <PlusCircle size={16} />
-</button> */}
  </div>
           {modalQuestionId && challengeId && onSelectQuestion && (
   <AssignToChallengeModal

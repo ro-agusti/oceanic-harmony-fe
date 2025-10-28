@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Circle, Check, Save, PlusCircle } from "lucide-react";
 import toast from "react-hot-toast";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../../../config/api';
 interface Question {
   id: string;
   text: string;
@@ -23,11 +22,11 @@ function SelectQuestionsChallenge() {
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set<string>());
-//   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const [selectedData, setSelectedData] = useState<Record<string, SelectedQuestion>>({});
   const [alreadySelectedIds, setAlreadySelectedIds] = useState<Set<string>>(new Set());
 
-  // Obtener todas las preguntas
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -46,7 +45,7 @@ function SelectQuestionsChallenge() {
     fetchQuestions();
   }, []);
 
-  // Obtener preguntas ya asignadas
+ 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!challengeId) return;
@@ -73,7 +72,7 @@ function SelectQuestionsChallenge() {
 
   const handleToggleSelect = (id: string) => {
   setSelectedIds(prev => {
-    const copy: Set<string> = new Set(prev); // ✅ especificar tipo Set<string>
+    const copy: Set<string> = new Set(prev); 
     if (copy.has(id)) {
       copy.delete(id);
     } else {
@@ -97,31 +96,6 @@ function SelectQuestionsChallenge() {
   });
 };
 
-//   const handleToggleSelect = (id: string) => {
-//     setSelectedIds(prev => {
-//       const copy: Set<string> = new Set(prev);
-//       if (copy.has(id)) {
-//         copy.delete(id);
-//       } else {
-//         copy.add(id);
-//       }
-//       return copy;
-//     });
-
-//     setSelectedData(prev => {
-//       const updated = { ...prev };
-//       if (updated[id]) {
-//         delete updated[id];
-//       } else {
-//         updated[id] = {
-//           day: 1,
-//           week: 1,
-//           questionCategory: "daily",
-//         };
-//       }
-//       return updated;
-//     });
-//   };
 
   const handleChange = (id: string, field: keyof SelectedQuestion, value: any) => {
     setSelectedData(prev => {
@@ -183,41 +157,6 @@ function SelectQuestionsChallenge() {
   }
 };
 
-//   const handleSubmit = async () => {
-//     const token = localStorage.getItem("token");
-
-//     const payload = Array.from(selectedIds).map(id => ({
-//       questionId: id,
-//       ...selectedData[id],
-//     }));
-
-//     if (payload.length === 0) {
-//       toast.error("⚠ No questions selected");
-//       return;
-//     }
-
-//     try {
-//       const res = await fetch("http://localhost:3000/api/challenge-questions", {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           challengeId,
-//           questions: payload,
-//         }),
-//       });
-
-//       if (!res.ok) throw new Error("Failed to save");
-
-//       toast.success("✅ Questions added!");
-//       navigate(`/admin/challenges/${challengeId}/assign`);
-//     } catch (err) {
-//       console.error(err);
-//       toast.error("❌ Error saving questions");
-//     }
-//   };
 
   const unselectedQuestions = allQuestions.filter(q => !alreadySelectedIds.has(q.id));
 

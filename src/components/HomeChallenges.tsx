@@ -3,8 +3,7 @@ import HomeNav from "./HomeNav";
 import AdminNav from "./admin/AdminNav";
 import UserNav from "./user/UserNav";
 import { useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../config/api';
 
 interface Challenge {
   id: string;
@@ -22,7 +21,7 @@ export default function HomeChallenges() {
   const [navType, setNavType] = useState<"admin" | "user" | "home">("home");
   const navigate = useNavigate();
 
-  // 🔹 Determinar el tipo de nav según el token
+  // Determine the type of nav based on the token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -41,7 +40,7 @@ export default function HomeChallenges() {
     }
   }, []);
 
-  // 🔹 Obtener lista de challenges
+  // Fetch list of challenges
   useEffect(() => {
     const fetchChallenges = async () => {
       try {
@@ -65,7 +64,7 @@ export default function HomeChallenges() {
     fetchChallenges();
   }, []);
 
-  // 🔹 Obtener challenges seleccionados del usuario
+  // Fetch selected challenges for the use
   useEffect(() => {
     const fetchUserChallenges = async () => {
       const token = localStorage.getItem("token");
@@ -89,11 +88,11 @@ export default function HomeChallenges() {
     fetchUserChallenges();
   }, []);
 
-  // 🔹 Función para seleccionar challenge
+  // Handles challenge selection
   const handleSelect = async (challengeId: string) => {
     const token = localStorage.getItem("token");
 
-    // Si no hay token → ir al login
+    
     if (!token) {
       navigate("/login");
       return;
@@ -120,7 +119,7 @@ export default function HomeChallenges() {
         return;
       }
 
-      // Agregar visualmente como seleccionado
+      // Highlight as selected
       setSelectedChallenges((prev) => [...prev, challengeId]);
       navigate("/user/my-challenges");
     } catch (err) {
@@ -131,7 +130,7 @@ export default function HomeChallenges() {
 
   if (loading) return <p className="p-4">Loading challenges...</p>;
 
-  // 🔹 Ordenar: primero los no seleccionados
+  // Sort challenges: unselected first
   const sortedChallenges = [...challenges].sort((a, b) => {
     const aSelected = selectedChallenges.includes(a.id);
     const bSelected = selectedChallenges.includes(b.id);
@@ -140,7 +139,7 @@ export default function HomeChallenges() {
 
   return (
     <div className="font-mono min-h-screen">
-      {/* 🔹 Navbar dinámica */}
+      
       {navType === "admin" && <AdminNav />}
       {navType === "user" && <UserNav />}
       {navType === "home" && <HomeNav />}
@@ -151,7 +150,7 @@ export default function HomeChallenges() {
             All Journals
           </h1>
 
-          {/* 🔹 Grid de Challenges */}
+      
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {sortedChallenges.map((ch) => {
               const isSelected = selectedChallenges.includes(ch.id);
@@ -179,11 +178,7 @@ export default function HomeChallenges() {
       Price: <span>${ch.price}</span>
     </p>
   )}
-                    {/* {parseFloat(ch.price) > 0 && (
-                      <p className="mt-2 text-sm text-gray-500">
-                        Price: <span>${ch.price}</span>
-                      </p>
-                    )} */}
+                    
                   </div>
 
                   <div className="mt-6 flex justify-center">

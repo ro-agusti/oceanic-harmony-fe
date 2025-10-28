@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from '../config/api';
 
 function LogIn() {
   const [formData, setFormData] = useState({
@@ -10,7 +9,7 @@ function LogIn() {
   });
 
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // Para redireccionar
+  const navigate = useNavigate(); 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,15 +28,14 @@ function LogIn() {
       
       const data = await response.json();
       if (response.ok) {
-        // setMessage('User registered successfully! Redirecting to login...');
-        // setTimeout(() => navigate('/login'), 2000); // Redirige al login después de 2 segundos
-        localStorage.setItem("token", data.token); // Guarda el token
-        const user = JSON.parse(atob(data.token.split(".")[1])); // Decodifica el token
+        
+        localStorage.setItem("token", data.token); 
+        const user = JSON.parse(atob(data.token.split(".")[1])); 
   
         if (user.role === "admin") {
-          navigate("/admin"); // Si es admin, va a HomeAdmin
+          navigate("/admin"); 
         } else {
-          navigate("/user"); // Si no es admin, va al Home normal
+          navigate("/user"); 
         }
       } else {
         setMessage(`Error: ${data.message}`);

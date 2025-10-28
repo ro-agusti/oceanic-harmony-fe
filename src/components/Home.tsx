@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Routes, Route, useNavigate } from 'react-router-dom'
-import { Menu, X } from "lucide-react"; // Íconos para el menú
-import { LogIn, UserPlus } from "lucide-react"; // Importa los íconos
-// //import './App.css'
-//import SignUp from './SignUp'
-//import LogIn from './LogIn'
+import { Menu, X } from "lucide-react"; 
+import { LogIn, UserPlus } from "lucide-react"; 
+
 
 function Home() {
-    // const [count, setCount] = useState(0)
-    const navigate = useNavigate() // Hook para redirigir a otra página
+    
+    const navigate = useNavigate() 
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
@@ -18,7 +16,7 @@ function Home() {
       Oceanic Harmony
     </h1>
 
-    {/* Botones en desktop */}
+    
     <div className="hidden md:flex gap-4">
           <button className="flex items-center gap-2 text-gray-500 hover:underline" onClick={() => navigate('/login')}>
           <LogIn size={20} className="mr-2" /> Log In
@@ -28,12 +26,12 @@ function Home() {
           </button>
         </div>
 
-      {/* Menú hamburguesa en mobile */}
+      
       <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
-        {/* Menú desplegable en mobile */}
+       
         {menuOpen && (
           <div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 flex flex-col gap-2">
             <button className="flex items-center gap-2 text-gray-500 hover:underline" onClick={() => { navigate('/login'); setMenuOpen(false); }}>
