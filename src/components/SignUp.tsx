@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_URL } from '../config/api';
+import { postJSON, tokenService, API } from '../config/api';
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -21,51 +21,41 @@ function SignUp() {
     e.preventDefault();
 
     try {
-      // Signup
-      const signupResponse = await fetch(`${API_URL}/api/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+    
+      const signupRes = await postJSON(API.auth.signup, formData, false);
 
-      const signupData = await signupResponse.json();
-
-      if (!signupResponse.ok) {
-        setMessage(`Error: ${signupData.message}`);
+      if (!signupRes.ok) {
+        setMessage(`Error: ${signupRes.data?.message || "Signup failed"}`);
         return;
       }
 
-      // Automatic login after signup
-      const loginResponse = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+   
+      const loginRes = await postJSON(
+        API.auth.login,
+        {
           email: formData.email,
           password: formData.password,
-        }),
-      });
+        },
+        false
+      );
 
-      const loginData = await loginResponse.json();
-
-      if (!loginResponse.ok) {
-        setMessage(`Signup successful, but login failed: ${loginData.message}`);
+      if (!loginRes.ok) {
+        setMessage(`Signup successful, but login failed: ${loginRes.data?.message}`);
         return;
       }
 
-      // Save token and redirect based on role
-      localStorage.setItem("token", loginData.token);
-      const user = JSON.parse(atob(loginData.token.split(".")[1]));
+      tokenService.save(loginRes.data.token);
+      const user = tokenService.getUser();
 
-      if (user.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/user");
-      }
+      if (!user) return setMessage("Invalid token");
 
-    } catch (error) {
-      console.error(error);
-      setMessage('Something went wrong.');
+      navigate(user.role === "admin" ? "/admin" : "/user");
+    } catch (err) {
+      console.error(err);
+      setMessage("Something went wrong.");
     }
+
+    
   };
 
   return (

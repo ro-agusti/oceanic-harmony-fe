@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserNav from "./UserNav";
 import AdminNav from "../admin/AdminNav";
-import { API_URL } from '../../config/api';
+import { tokenService, apiFetch, API } from '../../config/api';
 
 interface Challenge {
   id: string;
@@ -22,44 +22,27 @@ export default function MyChallenges() {
   const [role, setRole] = useState<"admin" | "user" | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const user = tokenService.getUser();
+    if (!user) {
       navigate("/login");
       return;
     }
 
-    try {
-      const payload = JSON.parse(
-        atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-      );
-      setRole(payload.role === "admin" ? "admin" : "user");
-    } catch (err) {
-      console.error("Error decoding token:", err);
-      navigate("/login");
-      return;
-    }
+    setRole(user.role === "admin" ? "admin" : "user");
 
     const fetchUserChallenges = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/user-challenges`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const res = await apiFetch<{ id: string; status: string; Challenge: any }[]>(API.userChallenges.all);
         if (!res.ok) throw new Error("Failed to fetch user challenges");
 
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setChallenges(
-            data.map((uc: any) => ({
-              ...uc.Challenge,
-              userChallengeId: uc.id,
-              status: uc.status,
-            }))
-          );
-        } else {
-          setChallenges(data.challenges || []);
-        }
+        // Mapear para un formato consistente
+        const mappedChallenges = res.data.map((uc) => ({
+          ...uc.Challenge,
+          userChallengeId: uc.id,
+          status: uc.status,
+        }));
 
+        setChallenges(mappedChallenges);
         setError(null);
       } catch (err) {
         console.error("Error fetching user challenges:", err);
@@ -73,7 +56,9 @@ export default function MyChallenges() {
   }, [navigate]);
 
   if (loading) return <p className="p-6 text-center">Loading your challenges...</p>;
+  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
 
+  
   return (
     <>
       {role === "admin" ? <AdminNav /> : <UserNav />}

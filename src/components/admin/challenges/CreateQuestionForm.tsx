@@ -1,6 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { API_URL } from '../../../config/api';
+import { apiFetch, tokenService, API } from '../../../config/api';
 interface CreateQuestionFormProps {
   challengeId?: string;
   onQuestionCreated?: () => void;
@@ -25,10 +25,10 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
     setOptions(options.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
+    const token = tokenService.get();
     if (!token) {
       toast.error("🔐 Admin token not found");
       return;
@@ -37,33 +37,31 @@ function CreateQuestionForm({ onQuestionCreated }: CreateQuestionFormProps) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          text,
-          description,
-          responseType,
-          allowCustomText,
-          options:
-            responseType === "multiple-choice"
-              ? options.filter((o) => o.trim() !== "").map((o) => ({ text: o }))
-              : undefined,
-        }),
-      });
+      const res = await apiFetch(
+        API.questions.all,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            text,
+            description,
+            responseType,
+            allowCustomText,
+            options:
+              responseType === "multiple-choice"
+                ? options.filter((o) => o.trim() !== "").map((o) => ({ text: o }))
+                : undefined,
+          }),
+        }
+      );
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to create question");
+        throw new Error((res.data as any)?.message || "Failed to create question");
       }
 
-      toast.success("✅ Question created!");
-      if (onQuestionCreated) onQuestionCreated();
+      toast.success("✅ Question created successfully!");
+      onQuestionCreated?.();
 
-     
+      
       setText("");
       setDescription("");
       setResponseType("text");

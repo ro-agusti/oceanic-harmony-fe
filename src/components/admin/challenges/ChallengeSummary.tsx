@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from '../../../config/api';
+import { apiFetch, tokenService, API } from '../../../config/api';
 export interface ChallengeData {
   days: number;
   weeks: number;
@@ -44,16 +44,19 @@ const ChallengeSummary = ({ challengeId, onDataLoaded, refreshSignal }: Challeng
 
   const fetchChallenge = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Admin token not found");
+      const token = tokenService.get();
+      if (!token) throw new Error("🔐 Admin token not found");
 
-      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.message || "Failed to fetch challenge");
+      const res = await apiFetch<{ challenge: Challenge }>(
+        API.challengeQuestions.byChallenge(challengeId),
+        { method: "GET" }
+      );
 
-      const fetchedChallenge: Challenge = json.challenge;
+      if (!res.ok || !res.data) {
+        throw new Error((res.data as any)?.message || "❌ Failed to fetch challenge summary");
+      }
+
+      const fetchedChallenge = res.data.challenge;
       setChallenge(fetchedChallenge);
 
       const { days, ChallengeQuestions } = fetchedChallenge;
@@ -62,17 +65,19 @@ const ChallengeSummary = ({ challengeId, onDataLoaded, refreshSignal }: Challeng
       const data: ChallengeData = {
         days,
         weeks,
-        dailyCount: ChallengeQuestions.filter((q) => q.questionCategory === "daily").length,
-        dailyReflectionCount: ChallengeQuestions.filter((q) => q.questionCategory === "daily-reflection").length,
-        weeklyReflectionCount: ChallengeQuestions.filter((q) => q.questionCategory === "weekly-reflection").length,
-        challengeReflectionCount: ChallengeQuestions.filter((q) => q.questionCategory === "challenge-reflection").length,
+        dailyCount: ChallengeQuestions.filter(q => q.questionCategory === "daily").length,
+        dailyReflectionCount: ChallengeQuestions.filter(q => q.questionCategory === "daily-reflection").length,
+        weeklyReflectionCount: ChallengeQuestions.filter(q => q.questionCategory === "weekly-reflection").length,
+        challengeReflectionCount: ChallengeQuestions.filter(q => q.questionCategory === "challenge-reflection").length,
         totalSelected: ChallengeQuestions.length,
       };
 
       setChallengeData(data);
       onDataLoaded?.(data);
+
     } catch (err: any) {
       console.error("Error fetching challenge summary:", err.message || err);
+      alert(err.message || "❌ Error fetching challenge summary");
     }
   };
 
@@ -80,6 +85,7 @@ const ChallengeSummary = ({ challengeId, onDataLoaded, refreshSignal }: Challeng
     fetchChallenge();
   }, [challengeId, refreshSignal]);
 
+ 
   if (!challenge || !challengeData) return <p>Loading summary...</p>;
 
   const { title, days, weeks, dailyCount, dailyReflectionCount, weeklyReflectionCount, challengeReflectionCount, totalSelected } = {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_URL } from '../config/api';
+import { postJSON, tokenService, API} from '../config/api';
 
 function LogIn() {
   const [formData, setFormData] = useState({
@@ -9,6 +9,7 @@ function LogIn() {
   });
 
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,33 +17,44 @@ function LogIn() {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-
+    setMessage("");
+    setLoading(true);
+  
     try {
-      const response = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      
+      const { ok, data } = await postJSON(API.auth.login, formData, false);
+
+      if (!ok) {
+        setMessage(`Error: ${data?.message || "Login failed"}`);
+        return;
+      }
+
+      if (!data?.token) {
+        setMessage("No token received from server");
+        return;
+      }
 
       
-      const data = await response.json();
-      if (response.ok) {
-        
-        localStorage.setItem("token", data.token); 
-        const user = JSON.parse(atob(data.token.split(".")[1])); 
-  
-        if (user.role === "admin") {
-          navigate("/admin"); 
-        } else {
-          navigate("/user"); 
-        }
-      } else {
-        setMessage(`Error: ${data.message}`);
+      tokenService.save(data.token);
+
+      const user = tokenService.getUser();
+      if (!user) {
+        setMessage("Invalid token");
+        tokenService.clear();
+        return;
       }
-    } catch (error) {
-      setMessage('Something went wrong.');
+
+     
+      navigate(user.role === "admin" ? "/admin" : "/user");
+    } catch (err) {
+      console.error("Login error:", err);
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  
+   
+    
   };
 
   return (

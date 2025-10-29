@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Menu, X } from "lucide-react"; 
 import { LogIn, UserPlus } from "lucide-react"; 
 

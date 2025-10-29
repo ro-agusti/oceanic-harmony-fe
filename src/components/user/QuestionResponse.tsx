@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { API_URL } from '../../config/api';
+import { tokenService,  postJSON, API } from '../../config/api';
 
 interface Option {
   id: string;
@@ -40,9 +40,9 @@ export default function QuestionResponse({
 
   const [localAnswer, setLocalAnswer] = useState(answerValue);
 
-  const handleSubmit = async (selectedOptionId?: string) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+   const handleSubmit = async (selectedOptionId?: string) => {
+    const user = tokenService.getUser();
+    if (!user) {
       alert("You must be logged in");
       return;
     }
@@ -53,31 +53,24 @@ export default function QuestionResponse({
       selectedOptionId: selectedOptionId || undefined,
       responseText: !selectedOptionId ? localAnswer : undefined,
     };
-    console.log("Posting response", body);
-console.log("Token:", token);
+
     try {
-      const res = await fetch(`${API_URL}/api/user-responses`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const res = await postJSON(API.responses.all, body);
 
       if (!res.ok) {
-        const text = await res.text();
-        console.error("Fetch failed:", res.status, text);
-        throw new Error("Failed to save response");
+        console.error("Error saving response:", res.data);
+        if (res.status === 401) tokenService.clear();
+        alert("Could not save response");
+        return;
       }
 
-      
+   
       onAnswerSaved(response.questionId, selectedOptionId || localAnswer);
 
-     
-      setLocalAnswer("");
+      setLocalAnswer(""); 
+
     } catch (err) {
-      console.error("Error saving response:", err);
+      console.error("Unexpected error:", err);
       alert("Could not save response");
     }
   };

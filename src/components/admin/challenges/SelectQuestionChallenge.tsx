@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Circle, Check, Save, PlusCircle } from "lucide-react";
 import toast from "react-hot-toast";
-import { API_URL } from '../../../config/api';
+import { apiFetch, postJSON, API } from '../../../config/api';
 interface Question {
   id: string;
   text: string;
@@ -26,137 +26,97 @@ function SelectQuestionsChallenge() {
   const [selectedData, setSelectedData] = useState<Record<string, SelectedQuestion>>({});
   const [alreadySelectedIds, setAlreadySelectedIds] = useState<Set<string>>(new Set());
 
-
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     const fetchQuestions = async () => {
-      const res = await fetch(`${API_URL}/api/questions`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      const questions = Array.isArray(data) ? data : data.questions || [];
-      setAllQuestions(questions);
+      try {
+        const res = await apiFetch<Question[]>(API.questions.all);
+        if (!res.ok) throw new Error("Failed to fetch questions");
+        setAllQuestions(res.data || []);
+      } catch (err) {
+        console.error(err);
+        toast.error("❌ Failed to load questions");
+      }
     };
-
     fetchQuestions();
   }, []);
 
- 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!challengeId) return;
-
     const fetchSelected = async () => {
-      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      try {
+        const res = await apiFetch<{ challenge?: { ChallengeQuestions?: any[] } }>(
+          API.challengeQuestions.byChallenge(challengeId)
+        );
+        if (!res.ok) throw new Error("Failed to fetch selected questions");
 
-      const data = await res.json();
-      const selectedIds = new Set<string>(
-  (data?.challenge?.ChallengeQuestions || [])
-    .map((cq: any) => cq.Question?.id)
-    .filter((id: any): id is string => typeof id === "string")
-
-);
-      setAlreadySelectedIds(selectedIds);
+        const ids = new Set<string>(
+          (res.data?.challenge?.ChallengeQuestions || [])
+            .map(cq => cq.Question?.id)
+            .filter((id): id is string => typeof id === "string")
+        );
+        setAlreadySelectedIds(ids);
+      } catch (err) {
+        console.error(err);
+        toast.error("❌ Failed to load selected questions");
+      }
     };
-
     fetchSelected();
   }, [challengeId]);
 
   const handleToggleSelect = (id: string) => {
-  setSelectedIds(prev => {
-    const copy: Set<string> = new Set(prev); 
-    if (copy.has(id)) {
-      copy.delete(id);
-    } else {
-      copy.add(id);
-    }
-    return copy;
-  });
+    setSelectedIds(prev => {
+      const copy = new Set(prev);
+      if (copy.has(id)) copy.delete(id);
+      else copy.add(id);
+      return copy;
+    });
 
-  setSelectedData(prev => {
-    const updated = { ...prev };
-    if (updated[id]) {
-      delete updated[id];
-    } else {
-      updated[id] = {
-        day: 1,
-        week: 1,
-        questionCategory: "daily",
-      };
-    }
-    return updated;
-  });
-};
-
+    setSelectedData(prev => {
+      const updated = { ...prev };
+      if (updated[id]) delete updated[id];
+      else updated[id] = { day: 1, week: 1, questionCategory: "daily" };
+      return updated;
+    });
+  };
 
   const handleChange = (id: string, field: keyof SelectedQuestion, value: any) => {
     setSelectedData(prev => {
       const updated = { ...prev };
       updated[id] = {
         ...updated[id],
-        [field]: field === "day"
-          ? parseInt(value)
-          : value,
-        week: field === "day"
-          ? Math.ceil(parseInt(value) / 7) || 1
-          : updated[id].week,
+        [field]: field === "day" ? parseInt(value) : value,
+        week: field === "day" ? Math.ceil(parseInt(value) / 7) || 1 : updated[id].week,
       };
       return updated;
     });
   };
 
   const handleSubmit = async () => {
-  const token = localStorage.getItem("token");
+    if (!challengeId) return;
 
-  const payload = Array.from(selectedIds).map(id => ({
-    questionId: id,
-    ...selectedData[id],
-  }));
+    const payload = Array.from(selectedIds).map(id => ({
+      challengeId,
+      questionId: id,
+      ...selectedData[id],
+    }));
 
-  if (payload.length === 0) {
-    toast.error("⚠ No questions selected");
-    return;
-  }
-
-  try {
-    for (const item of payload) {
-      const res = await fetch(`${API_URL}/api/challenge-questions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          challengeId,
-          questionId: item.questionId,
-          week: item.week,
-          day: item.day,
-          questionCategory: item.questionCategory,
-        }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Error for question ${item.questionId}: ${text}`);
-      }
+    if (payload.length === 0) {
+      toast.error("⚠ No questions selected");
+      return;
     }
 
-    toast.success("✅ All questions added!");
-    navigate(`/admin/challenges/${challengeId}/assign`);
-  } catch (err) {
-    console.error(err);
-    toast.error("❌ Failed to add one or more questions");
-  }
-};
-
+    try {
+      for (const item of payload) {
+        const res = await postJSON(API.challengeQuestions.all, item);
+        if (!res.ok) throw new Error(`Failed to add question ${item.questionId}`);
+      }
+      toast.success("✅ All questions added!");
+      navigate(`/admin/challenges/${challengeId}/assign`);
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Failed to add one or more questions");
+    }
+  };
 
   const unselectedQuestions = allQuestions.filter(q => !alreadySelectedIds.has(q.id));
 

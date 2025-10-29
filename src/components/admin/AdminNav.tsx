@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, HelpCircle, LogOut, Menu, X } from "lucide-react";
+import { Plus, LogOut, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function AdminNav() {

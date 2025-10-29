@@ -3,7 +3,7 @@ import HomeNav from "./HomeNav";
 import AdminNav from "./admin/AdminNav";
 import UserNav from "./user/UserNav";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from '../config/api';
+import { apiFetch, postJSON, tokenService, API } from '../config/api';
 
 interface Challenge {
   id: string;
@@ -21,121 +21,73 @@ export default function HomeChallenges() {
   const [navType, setNavType] = useState<"admin" | "user" | "home">("home");
   const navigate = useNavigate();
 
-  // Determine the type of nav based on the token
+ 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setNavType("home");
-      return;
-    }
-
-    try {
-      const payload = JSON.parse(
-        atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-      );
-      if (payload.role === "admin") setNavType("admin");
-      else setNavType("user");
-    } catch {
-      setNavType("home");
-    }
+    const user = tokenService.getUser();
+    if (!user) return setNavType("home");
+    setNavType(user.role === "admin" ? "admin" : "user");
   }, []);
 
-  // Fetch list of challenges
   useEffect(() => {
     const fetchChallenges = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/challenge`);
-        const data = await res.json();
-        console.log("API URL:", API_URL);
-        
-        console.log("Fetched challenges:", data);
-
-         const activeChallenges = data.challenges.filter(
-        (ch: Challenge) => ch.active === true
-      );
-
-      setChallenges(activeChallenges);
-      } catch (error) {
-        console.error("Error fetching challenges:", error);
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      const res = await apiFetch<{ challenges: Challenge[] }>(API.challenges.all, { method: "GET" }, false);
+      if (res.ok && res.data?.challenges) {
+        const activeChallenges = res.data.challenges.filter(ch => ch.active);
+        setChallenges(activeChallenges);
+      } else {
+        console.error("Error fetching challenges:", res.data);
       }
+      setLoading(false);
     };
+
     fetchChallenges();
   }, []);
+  
 
-  // Fetch selected challenges for the use
   useEffect(() => {
     const fetchUserChallenges = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      try {
-        const res = await fetch(`${API_URL}/api/user-challenges`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) return;
-        const data = await res.json();
-        setSelectedChallenges(data.map((uc: any) => uc.challengeId));
-      } catch (err) {
-        console.error("Error fetching user challenges:", err);
+      const res = await apiFetch<any[]>(API.userChallenges.all, { method: "GET" });
+      if (res.ok && Array.isArray(res.data)) {
+        setSelectedChallenges(res.data.map((uc: any) => uc.challengeId));
       }
     };
-
     fetchUserChallenges();
   }, []);
+ 
 
-  // Handles challenge selection
   const handleSelect = async (challengeId: string) => {
-    const token = localStorage.getItem("token");
-
-    
-    if (!token) {
+    const user = tokenService.getUser();
+    if (!user) {
       navigate("/login");
       return;
     }
 
-    try {
-      const postRes = await fetch(`${API_URL}/api/user-challenges`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ challengeId }),
-      });
-
-      if (postRes.status === 401 || postRes.status === 403) {
-        localStorage.removeItem("token");
+    const res = await postJSON(API.userChallenges.all, { challengeId });
+    if (!res.ok) {
+      console.error("Error selecting challenge:", res.data);
+      if (res.status === 401) {
+        tokenService.clear();
         navigate("/login");
-        return;
       }
-
-      if (!postRes.ok) {
-        console.error("Error selecting challenge:", await postRes.text());
-        return;
-      }
-
-      // Highlight as selected
-      setSelectedChallenges((prev) => [...prev, challengeId]);
-      navigate("/user/my-challenges");
-    } catch (err) {
-      console.error("Error selecting challenge:", err);
-      navigate("/login");
+      return;
     }
+
+    
+    setSelectedChallenges(prev => [...prev, challengeId]);
+    navigate("/user/my-challenges");
   };
+
 
   if (loading) return <p className="p-4">Loading challenges...</p>;
 
-  // Sort challenges: unselected first
+ 
   const sortedChallenges = [...challenges].sort((a, b) => {
     const aSelected = selectedChallenges.includes(a.id);
     const bSelected = selectedChallenges.includes(b.id);
     return Number(aSelected) - Number(bSelected);
   });
+
 
   return (
     <div className="font-mono min-h-screen">

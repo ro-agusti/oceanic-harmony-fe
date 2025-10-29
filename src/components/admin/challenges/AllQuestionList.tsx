@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { Pencil, Trash2, PlusCircle, Save } from "lucide-react";
 import AssignToChallengeModal from "./AssignToChallengeForm";
 import { SelectedQuestion, ChallengeData } from "../types/typesChallenges";
-import { API_URL } from '../../../config/api';
+import { apiFetch, API } from '../../../config/api';
 
 interface MultipleChoiceOption {
   id?: string;
@@ -44,31 +44,26 @@ export default function AllQuestionsList({
   const [editData, setEditData] = useState<Partial<Question>>({});
   const [modalQuestionId, setModalQuestionId] = useState<string | null>(null);
 
+
   const fetchQuestions = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No admin token found");
+      const res = await apiFetch<Question[]>(API.questions.all);
 
-      const res = await fetch(`${API_URL}/api/questions`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (!res.ok) throw new Error((res.data as any)?.message || "Failed to fetch questions");
 
-      
-      const data = await res.json();
-      if (!Array.isArray(data)) return setQuestions([]);
+      const formatted = (res.data || []).map((q: any) => ({
+        ...q,
+        options: q.MultipleChoiceOptions?.map((opt: any) => ({
+          id: opt.id,
+          optionText: opt.optionText,
+        })),
+      }));
 
-      setQuestions(
-        data.map((q: any) => ({
-          ...q,
-          options: q.MultipleChoiceOptions?.map((opt: any) => ({
-            id: opt.id,
-            optionText: opt.optionText,
-          })),
-        }))
-      );
-    } catch (err) {
-      console.error("Error fetching questions", err);
+      setQuestions(formatted);
+    } catch (err: any) {
+      console.error("Error fetching questions:", err);
+      toast.error(err.message || "Failed to load questions");
     } finally {
       setLoading(false);
     }
@@ -91,9 +86,6 @@ export default function AllQuestionsList({
   };
 
   const handleSave = async (id: string) => {
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("🔐 Admin token not found");
-
     try {
       const payload = {
         ...editData,
@@ -103,19 +95,12 @@ export default function AllQuestionsList({
             : undefined,
       };
 
-      const res = await fetch(`${API_URL}/api/questions/${id}`, {
+      const res = await apiFetch(API.questions.byId(id), {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to update question");
-      }
+      if (!res.ok) throw new Error((res.data as any)?.message || "Failed to update question");
 
       toast.success("✅ Question updated");
       setEditingId(null);
@@ -127,20 +112,13 @@ export default function AllQuestionsList({
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this question?")) return;
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("🔐 Admin token not found");
 
     try {
       setDeleting(id);
-      const res = await fetch(`${API_URL}/api/questions/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await apiFetch(API.questions.byId(id), { method: "DELETE" });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to delete question");
-      }
+      if (!res.ok) throw new Error((res.data as any)?.message || "Failed to delete question");
+
       toast.success("🗑️ Question deleted");
       fetchQuestions();
     } catch (err: any) {

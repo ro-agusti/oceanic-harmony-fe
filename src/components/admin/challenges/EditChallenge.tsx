@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL } from '../../../config/api';
+import { apiFetch, API } from '../../../config/api';
 
 interface Challenge {
   id: string;
@@ -20,25 +20,24 @@ export default function EditChallenge() {
 
   useEffect(() => {
     const fetchChallenge = async () => {
-      const token = localStorage.getItem("token");
-      if (!token || !challengeId) return;
+      if (!challengeId) return;
+      setLoading(true);
+      setError("");
 
       try {
-        const response = await fetch(`${API_URL}/api/challenge/${challengeId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await apiFetch<{ challenge: Challenge }>(
+          API.challenges.byId(challengeId)
+        );
 
-        if (!response.ok) throw new Error("Error al obtener el challenge");
+        if (!res.ok) {
+          throw new Error((res.data as any)?.message || "Failed to fetch challenge");
+        }
 
-        const data = await response.json();
-        setOriginalChallenge(data.challenge);
-        setEditableChallenge(data.challenge);
-      } catch (err) {
+        setOriginalChallenge(res.data!.challenge);
+        setEditableChallenge(res.data!.challenge);
+      } catch (err: any) {
         console.error(err);
-        setError("Error cargando el challenge");
+        setError(err.message || "Failed to load challenge");
       } finally {
         setLoading(false);
       }
@@ -60,31 +59,29 @@ export default function EditChallenge() {
     e.preventDefault();
     if (!editableChallenge || !challengeId) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
-      const response = await fetch(`${API_URL}/api/challenge/${challengeId}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editableChallenge),
-      });
+      const res = await apiFetch(
+        API.challenges.byId(challengeId),
+        {
+          method: "PUT",
+          body: JSON.stringify(editableChallenge),
+        }
+      );
 
-      if (!response.ok) throw new Error("Error al actualizar challenge");
+      if (!res.ok) {
+        throw new Error((res.data as any)?.message || "Failed to update challenge");
+      }
 
-      alert("Challenge actualizado correctamente");
+      alert("Challenge updated successfully");
       navigate("/admin/challenges");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error al actualizar challenge");
+      alert(err.message || "Failed to update challenge");
     }
   };
 
-  if (loading) return <p className="mt-10 text-center">Cargando...</p>;
-  if (error || !originalChallenge) return <p className="mt-10 text-center text-red-500">{error || "Challenge no encontrado"}</p>;
+  if (loading) return <p className="mt-10 text-center">Loading...</p>;
+  if (error || !originalChallenge) return <p className="mt-10 text-center text-red-500">{error || "Challenge not found"}</p>;
 
   return (
     <div className="max-w-6xl w-full mx-auto mt-20 p-4 sm:p-6 md:p-8 bg-white shadow rounded">

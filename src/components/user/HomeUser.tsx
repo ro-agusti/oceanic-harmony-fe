@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from '../../config/api';
+import { tokenService, apiFetch, API } from '../../config/api';
 
 interface UserProfile {
   id: string;
@@ -15,25 +15,21 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const user = tokenService.getUser();
+    if (!user) {
       navigate("/login");
       return;
     }
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiFetch<UserProfile>(API.auth.profile);
+        if (!res.ok || !res.data) throw new Error("Failed to fetch profile");
 
-        if (!res.ok) throw new Error("Failed to fetch profile");
-
-        const data = await res.json();
-        setProfile(data);
+        setProfile(res.data);
       } catch (err) {
         console.error("Error fetching user profile:", err);
-        localStorage.removeItem("token");
+        tokenService.clear();
         navigate("/login");
       } finally {
         setLoading(false);
@@ -43,12 +39,9 @@ export default function UserDashboard() {
     fetchProfile();
   }, [navigate]);
 
-  if (loading) {
-    return <p className="p-6 text-center">Loading profile...</p>;
-  }
-
+  if (loading) return <p className="p-6 text-center">Loading profile...</p>;
   if (!profile) return null;
-
+ 
   return (
     <div className="min-h-screen flex flex-col">
     

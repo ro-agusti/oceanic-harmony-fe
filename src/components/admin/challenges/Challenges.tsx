@@ -2,7 +2,7 @@ import AdminNav from "../AdminNav";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Trash2, PlusCircle, CheckCircle, XCircle } from "lucide-react";
-import { API_URL } from '../../../config/api';
+import { apiFetch, tokenService, API } from '../../../config/api';
 
 interface Challenge {
   id: string;
@@ -35,75 +35,54 @@ function Challenges() {
   const [hoveredButtonId, setHoveredButtonId] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
+    const user = tokenService.getUser();
+    if (!user) {
       navigate("/login");
       return;
     }
 
-    try {
-      const user = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-
-      if (user.role === "admin") {
-        setIsAdmin(true);
-
-        const fetchChallenges = async () => {
-          try {
-            const response = await fetch(`${API_URL}/api/challenge`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
-
-            if (!response.ok) throw new Error("Error al obtener challenges");
-
-            const data = await response.json();
-            const challengesData = data.challenges || [];
-
-            const challengesWithQuestions = await Promise.all(
-              challengesData.map(async (challenge: Challenge) => {
-                try {
-                  const questionsResponse = await fetch(
-                    `${API_URL}/api/challenge-questions/${challenge.id}`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  );
-
-                  if (!questionsResponse.ok) throw new Error("Error al obtener preguntas");
-
-                  const questionsData = await questionsResponse.json();
-
-                  return {
-                    ...challenge,
-                    ChallengeQuestions: questionsData.challenge?.ChallengeQuestions || [],
-                  };
-                } catch (error) {
-                  console.error(`Error fetching questions for challenge ${challenge.id}:`, error);
-                  return { ...challenge, ChallengeQuestions: [] };
-                }
-              })
-            );
-
-            setChallenges(challengesWithQuestions);
-          } catch (error) {
-            console.error("Error fetching challenges:", error);
-          }
-        };
-
-        fetchChallenges();
-      } else {
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      navigate("/login");
+    if (user.role !== "admin") {
+      navigate("/");
+      return;
     }
+
+    setIsAdmin(true);
+
+    const fetchChallenges = async () => {
+      try {
+        const res = await apiFetch<{ challenges: Challenge[] }>(API.challenges.all);
+
+        if (!res.ok || !res.data) {
+          throw new Error((res.data as any)?.message || "Failed to fetch challenges");
+        }
+
+        const challengesData = res.data.challenges || [];
+
+        
+        const challengesWithQuestions = await Promise.all(
+          challengesData.map(async (ch) => {
+            try {
+              const questionsRes = await apiFetch<{ challenge: { ChallengeQuestions: any[] } }>(
+                API.challengeQuestions.byChallenge(ch.id)
+              );
+              return {
+                ...ch,
+                ChallengeQuestions: questionsRes.data?.challenge?.ChallengeQuestions || [],
+              };
+            } catch (err) {
+              console.error(`Error fetching questions for challenge ${ch.id}:`, err);
+              return { ...ch, ChallengeQuestions: [] };
+            }
+          })
+        );
+
+        setChallenges(challengesWithQuestions);
+      } catch (err) {
+        console.error("Error fetching challenges:", err);
+      }
+    };
+
+    fetchChallenges();
   }, [navigate]);
 
   const handleCreateChallenge = () => navigate("/admin/create-challenge");
@@ -111,57 +90,46 @@ function Challenges() {
   const handleEdit = (id: string) => navigate(`/admin/edit-challenge/${id}`);
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este challenge?");
-    if (!confirmDelete) return;
+  if (!window.confirm("Are you sure you want to delete this challenge?")) return;
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_URL}/api/challenge/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+  try {
+    const res = await apiFetch(API.challenges.byId(id), { method: "DELETE" });
 
-      if (!response.ok) throw new Error("Error al eliminar challenge");
+    if (!res.ok) throw new Error((res.data as any)?.message || "Failed to delete challenge");
 
-      setChallenges((prev) => prev.filter((ch) => ch.id !== id));
-    } catch (error) {
-      console.error("Error deleting challenge:", error);
-    }
-  };
+    setChallenges((prev) => prev.filter((ch) => ch.id !== id));
+  } catch (err: any) {
+    console.error("Error deleting challenge:", err);
+    alert(err.message || "Error deleting challenge");
+  }
+};
 
   const toggleExpand = (id: string) => {
     setExpandedChallengeId(expandedChallengeId === id ? null : id);
   };
 
-  const toggleActive = async (id: string, newState: boolean) => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await fetch(`${API_URL}/api/challenge/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ active: newState }),
-      });
+const toggleActive = async (id: string, newState: boolean) => {
+  try {
+    const res = await apiFetch(API.challenges.byId(id), {
+      method: "PUT",
+      body: JSON.stringify({ active: newState }),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData?.error || "Error updating challenge");
-      }
+    if (!res.ok) throw new Error((res.data as any)?.message || "Failed to update active state");
 
-      setChallenges((prev) =>
-        prev.map((ch) => (ch.id === id ? { ...ch, active: newState } : ch))
-      );
-    } catch (error) {
-      console.error("Error updating active state:", error);
-    }
-  };
+    setChallenges((prev) =>
+      prev.map((ch) => (ch.id === id ? { ...ch, active: newState } : ch))
+    );
+  } catch (err: any) {
+    console.error("Error updating active state:", err);
+    alert(err.message || "Error updating active state");
+  }
+};
 
-  return isAdmin ? (
+
+  if (!isAdmin) return null;
+ 
+  return  (
     <div className="min-h-screen bg-[#fbf7f1] text-gray-700">
       <header>
         <AdminNav />
@@ -304,7 +272,7 @@ function Challenges() {
         </div>
       </main>
     </div>
-  ) : null;
+  );
 }
 
 export default Challenges;

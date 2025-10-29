@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import UserNav from "./UserNav";
 import AdminNav from "../admin/AdminNav";
 import QuestionResponse from "./QuestionResponse";
-import { API_URL } from '../../config/api';
+import { tokenService, apiFetch, API } from '../../config/api';
 
 interface Option {
   id: string;
@@ -40,39 +40,21 @@ export default function ChallengeResponses() {
   const [direction, setDirection] = useState(0); // 1 = next, -1 = prev
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const user = tokenService.getUser();
+    if (!user) {
       navigate("/login");
       return;
     }
-
-    try {
-      const payload = JSON.parse(
-        atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-      );
-      setRole(payload.role === "admin" ? "admin" : "user");
-    } catch (err) {
-      console.error("Error decoding token:", err);
-      navigate("/login");
-      return;
-    }
+    setRole(user.role === "admin" ? "admin" : "user");
     if (!userChallengeId) return;
 
     const fetchResponses = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
       try {
-        const res = await fetch(`${API_URL}/api/user-responses/${userChallengeId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch responses");
+        const res = await apiFetch<{ responses: Response[] }>(API.responses.byId(userChallengeId));
+        if (!res.ok || !res.data) throw new Error("Failed to fetch responses");
 
-        const data = await res.json();
-        setResponses(data.responses || []);
+        setResponses(res.data.responses || []);
+        setError(null);
       } catch (err) {
         console.error(err);
         setError("Could not load responses.");
@@ -84,15 +66,11 @@ export default function ChallengeResponses() {
     fetchResponses();
   }, [navigate, userChallengeId]);
 
- 
-
   if (loading) return <p className="p-6 text-center">Loading responses...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
   if (responses.length === 0) return <p className="p-6 text-center">No responses yet.</p>;
 
   const currentResponse = responses[currentIndex];
-
- 
 
   return (
     <div className="min-h-screen">

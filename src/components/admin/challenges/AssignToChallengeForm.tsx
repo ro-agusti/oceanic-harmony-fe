@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { ChallengeData, SelectedQuestion } from "../types/typesChallenges";
-import { API_URL } from '../../../config/api';
+import { apiFetch, API } from '../../../config/api';
 interface AssignToChallengeModalProps {
   questionId: string;
   questionText: string;
@@ -28,8 +28,7 @@ export default function AssignToChallengeModal({
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
-    if (!day || !questionCategory)
-      return toast.error("Select day and category");
+    if (!day || !questionCategory) return toast.error("Select day and category");
 
     if (challengeData) {
       const currentCount = selectedQuestions.filter(
@@ -58,9 +57,7 @@ export default function AssignToChallengeModal({
       }
 
       const duplicate = selectedQuestions.some(
-        (q) =>
-          q.questionCategory === questionCategory &&
-          q.day === day
+        (q) => q.questionCategory === questionCategory && q.day === day
       );
 
       if (duplicate) {
@@ -71,8 +68,6 @@ export default function AssignToChallengeModal({
     }
 
     const week = Math.ceil(Number(day) / 7);
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("Admin token missing");
 
     try {
       setLoading(true);
@@ -81,25 +76,14 @@ export default function AssignToChallengeModal({
         challengeId,
         questions: [{ questionId, questionCategory, week, day }],
       };
-      console.log("Request body:", payload);
 
-      const res = await fetch(`${API_URL}/api/challenge-questions`, {
+      const res = await apiFetch(API.challengeQuestions.all, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        if (error.message?.toLowerCase().includes("already assigned")) {
-          throw new Error(
-            `This question is already assigned to day ${day} of this challenge`
-          );
-        }
-        throw new Error(error.message || "Error assigning question");
+        throw new Error((res.data as any)?.message || "Error assigning question");
       }
 
       toast.success("Question assigned!");
@@ -113,39 +97,35 @@ export default function AssignToChallengeModal({
   };
 
   const renderDayOptions = () => {
-  if (!challengeData) return null;
-  const { days } = challengeData;
-  const weeks = Math.ceil(days / 7);
+    if (!challengeData) return null;
+    const { days } = challengeData;
+    const weeks = Math.ceil(days / 7);
 
-  let options: number[] = [];
-  switch (questionCategory) {
-    case "daily":
-    case "daily-reflection":
-      options = Array.from({ length: days }, (_, i) => i + 1);
-      break;
-    case "weekly-reflection":
-      options = Array.from({ length: weeks }, (_, i) => (i + 1) * 7);
-      break;
-    case "challenge-reflection":
-      options = [days];
-      break;
-    default:
-      options = [];
-  }
+    let options: number[] = [];
+    switch (questionCategory) {
+      case "daily":
+      case "daily-reflection":
+        options = Array.from({ length: days }, (_, i) => i + 1);
+        break;
+      case "weekly-reflection":
+        options = Array.from({ length: weeks }, (_, i) => (i + 1) * 7);
+        break;
+      case "challenge-reflection":
+        options = [days];
+        break;
+    }
 
-  // 🔹 Filtrar días ya ocupados por la misma categoría
-  const availableDays = options.filter(d =>
-    !selectedQuestions.some(
-      q => q.questionCategory === questionCategory && q.day === d
-    )
-  );
-
-  return availableDays.map((d) => (
-    <option key={d} value={d}>
-      Day {d}
-    </option>
-  ));
-};
+    // 🔹 Filtrar días ya ocupados por la misma categoría
+    return options
+      .filter((d) =>
+        !selectedQuestions.some((q) => q.questionCategory === questionCategory && q.day === d)
+      )
+      .map((d) => (
+        <option key={d} value={d}>
+          Day {d}
+        </option>
+      ));
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 isolation-isolate">

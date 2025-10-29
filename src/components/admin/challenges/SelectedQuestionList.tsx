@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Trash2, Edit, Save, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { API_URL } from '../../../config/api';
+import { apiFetch, API } from '../../../config/api';
 
 interface SelectedQuestion {
   question: {
@@ -49,19 +49,20 @@ export default function SelectedQuestionsList({
   });
 
   const fetchSelectedQuestions = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Admin token not found");
+      const res = await apiFetch<{ challenge?: { ChallengeQuestions?: any[] } }>(
+        API.challengeQuestions.byChallenge(challengeId)
+      );
+      if (!res.ok) {
+  const errorMsg =
+    (res.data && (res.data as any).message) || `Failed to fetch selected questions`;
+  throw new Error(errorMsg);
+}
+      // if (!res.ok) throw new Error(res.data?.message || "Failed to fetch selected questions");
 
-      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch selected questions");
-
-      const formatted: SelectedQuestion[] = (data.challenge?.ChallengeQuestions || [])
+      const formatted: SelectedQuestion[] = (res.data?.challenge?.ChallengeQuestions || [])
         .map((item: any) => ({
           question: {
             id: item.Question.id,
@@ -73,9 +74,7 @@ export default function SelectedQuestionsList({
           week: item.week,
           questionCategory: item.questionCategory,
         }))
-        .sort((a: SelectedQuestion, b: SelectedQuestion) =>
-          a.week === b.week ? a.day - b.day : a.week - b.week
-        );
+        .sort((a, b) => (a.week === b.week ? a.day - b.day : a.week - b.week));
 
       setSelectedQuestions(formatted);
       onSelectedQuestionsLoaded?.(formatted);
@@ -93,18 +92,14 @@ export default function SelectedQuestionsList({
 
   const handleDelete = async (questionId: string) => {
     if (!confirm("Are you sure you want to remove this question from the challenge?")) return;
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("Admin token not found");
 
     try {
-      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}/${questionId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to delete question");
-      }
+      const res = await apiFetch(
+        API.challengeQuestions.byChallengeAndQuestion(challengeId, questionId),
+        { method: "DELETE" }
+      );
+      if (!res.ok) throw new Error(res.data?.message || "Failed to delete question");
+
       toast.success("Question removed from challenge");
       fetchSelectedQuestions();
     } catch (err: any) {
@@ -131,26 +126,20 @@ export default function SelectedQuestionsList({
     );
     if (duplicate) return toast.error(`A "${category}" question already exists for day ${day}.`);
 
-    const token = localStorage.getItem("token");
-    if (!token) return toast.error("Admin token not found");
-
     try {
-      const res = await fetch(`${API_URL}/api/challenge-questions/${challengeId}/${questionId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          day,
-          questionCategory: category,
-          week: Math.ceil(day / 7),
-        }),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to update question");
-      }
+      const res = await apiFetch(
+        API.challengeQuestions.byChallengeAndQuestion(challengeId, questionId),
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            day,
+            questionCategory: category,
+            week: Math.ceil(day / 7),
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(res.data?.message || "Failed to update question");
+
       toast.success("Question updated");
       setEditingId(null);
       fetchSelectedQuestions();
@@ -163,6 +152,7 @@ export default function SelectedQuestionsList({
   if (error) return <p className="text-red-500">{error}</p>;
   if (selectedQuestions.length === 0) return <p>No questions assigned yet.</p>;
 
+  
   return (
     <div className="w-full font-mono text-sm text-gray-700 bg-[#fbf7f1] p-4 rounded shadow">
       <ul className="space-y-3">
