@@ -93,6 +93,9 @@ function Challenges() {
   if (!window.confirm("Are you sure you want to delete this challenge?")) return;
 
   try {
+
+    console.log('deleting challenge', id);
+
     const res = await apiFetch(API.challenges.byId(id), { method: "DELETE" });
 
     if (!res.ok) throw new Error((res.data as any)?.message || "Failed to delete challenge");
@@ -108,14 +111,22 @@ function Challenges() {
     setExpandedChallengeId(expandedChallengeId === id ? null : id);
   };
 
-const toggleActive = async (id: string, newState: boolean) => {
+  const toggleActive = async (id: string, newState: boolean) => {
   try {
+    console.log("Token:", tokenService.get());
+    console.log("PUT body:", { active: newState });
+
     const res = await apiFetch(API.challenges.byId(id), {
       method: "PUT",
       body: JSON.stringify({ active: newState }),
     });
 
-    if (!res.ok) throw new Error((res.data as any)?.message || "Failed to update active state");
+    console.log("toggleActive response:", res);
+
+    if (!res.ok) {
+      const message = res.data?.message || `Failed to update active state (status ${res.status})`;
+      throw new Error(message);
+    }
 
     setChallenges((prev) =>
       prev.map((ch) => (ch.id === id ? { ...ch, active: newState } : ch))
@@ -125,6 +136,24 @@ const toggleActive = async (id: string, newState: boolean) => {
     alert(err.message || "Error updating active state");
   }
 };
+
+// const toggleActive = async (id: string, newState: boolean) => {
+//   try {
+//     const res = await apiFetch(API.challenges.byId(id), {
+//       method: "PUT",
+//       body: JSON.stringify({ active: newState }),
+//     });
+
+//     if (!res.ok) throw new Error((res.data as any)?.message || "Failed to update active state");
+
+//     setChallenges((prev) =>
+//       prev.map((ch) => (ch.id === id ? { ...ch, active: newState } : ch))
+//     );
+//   } catch (err: any) {
+//     console.error("Error updating active state:", err);
+//     alert(err.message || "Error updating active state");
+//   }
+// };
 
 
   if (!isAdmin) return null;

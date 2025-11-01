@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+//import { AnimatePresence } from "framer-motion";
 import UserNav from "./UserNav";
 import AdminNav from "../admin/AdminNav";
 import QuestionResponse from "./QuestionResponse";
 import { tokenService, apiFetch, API } from '../../config/api';
+import MyChallenges from './MyChallenges';
 
 interface Option {
   id: string;
@@ -79,14 +80,14 @@ export default function ChallengeResponses() {
       {/* Título y progreso */}
       <div className="max-w-5xl w-full mx-auto px-6 mt-24">
         <h1 className="text-2xl font-bold text-gray-700 mb-4 font-mono">{challengeTitle}</h1>
-
-        <div className="flex gap-2 mb-6">
+        
+        <div className="flex justify-center gap-2 mb-6 ">
           {responses.map((r, index) => (
             <div
               key={r.id}
-              className={`w-6 h-6 rounded-full border-2 cursor-pointer ${
-                r.answer ? "bg-blue-500 border-blue-500" : "bg-white border-gray-300"
-              } ${index === currentIndex ? "ring-2 ring-blue-400" : ""}`}
+              className={`w-6 h-6 rounded-full  cursor-pointer ${
+                r.answer ? "bg-[#ccc3b5]" : "bg-white"
+              } ${index === currentIndex ? "ring-2 ring-[#ccc3b5]" : ""}`}
               onClick={() => {
                 setDirection(index > currentIndex ? 1 : -1);
                 setCurrentIndex(index);
@@ -98,9 +99,9 @@ export default function ChallengeResponses() {
 
      
       <div className="max-w-5xl mx-auto px-6">
- <AnimatePresence custom={direction} initial={false}>
+ <div className="max-w-5xl mx-auto px-6">
   <QuestionResponse
-    key={currentIndex} 
+    key={currentIndex}
     response={currentResponse}
     answerValue={answers[currentResponse.questionId] || ""}
     challengeId={userChallengeId!}
@@ -119,11 +120,14 @@ export default function ChallengeResponses() {
       }
     }}
   />
-</AnimatePresence>
+</div>
+
 
 
 </div>
-
+<button type="submit" className="text-m font-mono text-gray-700 mb-4 hover:underline" onClick={() => navigate('/user/my-challenges')}>
+  Back to MyChallenges
+  </button>
     </div>
   );
 }

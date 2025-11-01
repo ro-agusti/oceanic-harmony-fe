@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+
 import { tokenService,  postJSON, API } from '../../config/api';
 
 interface Option {
@@ -30,17 +30,15 @@ export default function QuestionResponse({
   answerValue,
   onAnswerSaved,
   challengeId,
-  direction = 0,
+
 }: QuestionResponseProps) {
-  const variants = {
-    enter: (direction: number) => ({ x: direction > 0 ? 300 : -300, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({ x: direction > 0 ? -300 : 300, opacity: 0 }),
-  };
+
 
   const [localAnswer, setLocalAnswer] = useState(answerValue);
 
    const handleSubmit = async (selectedOptionId?: string) => {
+
+  
     const user = tokenService.getUser();
     if (!user) {
       alert("You must be logged in");
@@ -49,15 +47,20 @@ export default function QuestionResponse({
 
     const body = {
       questionId: response.questionId,
-      challengeId,
+      userChallengeId: challengeId,
       selectedOptionId: selectedOptionId || undefined,
       responseText: !selectedOptionId ? localAnswer : undefined,
     };
 
+ 
+    
     try {
+
+
       const res = await postJSON(API.responses.all, body);
 
       if (!res.ok) {
+        
         console.error("Error saving response:", res.data);
         if (res.status === 401) tokenService.clear();
         alert("Could not save response");
@@ -76,14 +79,9 @@ export default function QuestionResponse({
   };
 
   return (
-    <motion.div
+    <div
       key={response.id}
-      custom={direction}
-      variants={variants}
-      initial="enter"
-      animate="center"
-      exit="exit"
-      transition={{ duration: 0.3 }}
+  
       className="border p-4 rounded-lg shadow-sm bg-[#fbf7f1]"
     >
       <p className="font-semibold mb-2">{response.question}</p>
@@ -112,6 +110,7 @@ export default function QuestionResponse({
             onChange={(e) => setLocalAnswer(e.target.value)}
           />
           <button
+          type="button"
             className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             onClick={() => handleSubmit()}
           >
@@ -119,6 +118,6 @@ export default function QuestionResponse({
           </button>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }

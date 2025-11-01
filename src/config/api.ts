@@ -57,26 +57,62 @@ export const apiFetch = async <T = any>(
   options: RequestInit = {},
   requireAuth = true
 ): Promise<FetchResult<T>> => {
-  
   const token = tokenService.get();
 
   const headers: Record<string, string> = {
-  "Content-Type": "application/json",
-  ...(options.headers as Record<string, string>),
-};
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
 
-if (requireAuth && token) {
-  headers["Authorization"] = `Bearer ${token}`;
-}
-  const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
-
-
-  if (res.status === 401) {
-    tokenService.clear();
+  if (requireAuth && token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
-  return handleResponse<T>(res);
+  
+
+  try {
+    const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+
+    if (res.status === 401) {
+      tokenService.clear();
+    }
+
+    return handleResponse<T>(res);
+  } catch (err) {
+    console.error("❌ Network or fetch error:", err);
+    return {
+      ok: false,
+      status: 0,
+      data: { message: "Network error or invalid endpoint" } as T,
+    };
+  }
 };
+
+// export const apiFetch = async <T = any>(
+//   endpoint: string,
+//   options: RequestInit = {},
+//   requireAuth = true
+// ): Promise<FetchResult<T>> => {
+  
+//   const token = tokenService.get();
+
+//   const headers: Record<string, string> = {
+//   "Content-Type": "application/json",
+//   ...(options.headers as Record<string, string>),
+// };
+
+// if (requireAuth && token) {
+//   headers["Authorization"] = `Bearer ${token}`;
+// }
+//   const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+
+
+//   if (res.status === 401) {
+//     tokenService.clear();
+//   }
+
+//   return handleResponse<T>(res);
+// };
 
 export const postJSON = async <T = any>(
   endpoint: string,
@@ -98,7 +134,7 @@ export const API = {
   },
   challenges: {
     all: "/api/challenge",
-    byId: (id: string) => `/api/challenges/${id}`,
+    byId: (id: string) => `/api/challenge/${id}`,
   },
   questions: {
     all: "/api/questions",
